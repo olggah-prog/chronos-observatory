@@ -16,10 +16,9 @@ const R = {
 
 // Glyph sizes — no circle badge, just the classical symbol  (×1.5 from original)
 const PLANET_SIZE = {
-  Sun: 39, Moon: 24, Venus: 21, Mars: 21,
-  Jupiter: 20, Saturn: 20, Mercury: 20,
-  Uranus: 20, Neptune: 20, Pluto: 20,
-  NNode: 20, SNode: 18,
+  Sun: 39, Moon: 21, Mercury: 21, Venus: 21, Mars: 21,
+  Jupiter: 21, Saturn: 21, Uranus: 21, Neptune: 21, Pluto: 21,
+  NNode: 21, SNode: 21,
 }
 
 function lonXY(lon, r) {
