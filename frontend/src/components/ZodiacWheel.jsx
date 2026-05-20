@@ -18,7 +18,7 @@ const R = {
 const PLANET_SIZE = {
   Sun: 39, Moon: 24, Venus: 21, Mars: 21,
   Jupiter: 20, Saturn: 20, Mercury: 20,
-  Uranus: 18, Neptune: 18, Pluto: 17,
+  Uranus: 20, Neptune: 20, Pluto: 20,
   NNode: 20, SNode: 18,
 }
 
