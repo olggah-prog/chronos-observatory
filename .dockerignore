@@ -1,0 +1,6 @@
+frontend/
+.git/
+.gitignore
+README.md
+vercel.json
+Procfile
