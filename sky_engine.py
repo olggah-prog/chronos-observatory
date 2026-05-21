@@ -31,18 +31,18 @@ ZODIAC_SIGNS = [
 INNER_PLANETS = {"Mercury", "Venus"}
 
 FIXED_STARS = [
-    ("Aldebaran", ",HIP 21421"),
-    ("Regulus",   ",HIP 49669"),
-    ("Antares",   ",HIP 80763"),
-    ("Fomalhaut", ",HIP 113368"),
-    ("Spica",     ",HIP 65474"),
-    ("Alcyone",   ",HIP 17702"),
-    ("Sirius",    ",HIP 32349"),
-    ("Vega",      ",HIP 91262"),
-    ("Arcturus",  ",HIP 69673"),
-    ("Achernar",  ",HIP 7588"),
-    ("Pollux",    ",HIP 37826"),
-    ("Deneb",     ",HIP 102098"),
+    "Aldebaran",
+    "Regulus",
+    "Antares",
+    "Fomalhaut",
+    "Spica",
+    "Alcyone",
+    "Sirius",
+    "Vega",
+    "Arcturus",
+    "Achernar",
+    "Pollux",
+    "Deneb",
 ]
 
 
@@ -67,38 +67,37 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
     stars = []
     conjunctions = []
 
-    for name, hip_id in FIXED_STARS:
+    for name in FIXED_STARS:
         try:
-            _, xx, _ = swe.fixstar2(hip_id, jd, SIDEREAL_FLAG)
+            ret, xx, serr = swe.fixstar2(name, jd, SIDEREAL_FLAG)
+            star_lon = xx[0]
+            star_lat = xx[1]
+            star_dist = xx[2]
+
+            stars.append({
+                "name":      name,
+                "lon":       round(star_lon, 4),
+                "lat":       round(star_lat, 4),
+                "dist_pc":   round(star_dist, 4),
+                "zodiac_sign": _zodiac_sign(star_lon),
+            })
+
+            for p in planet_data:
+                p_lon   = p["longitude"]
+                p_speed = p["speed_deg_per_day"]
+                diff    = _angular_diff(p_lon, star_lon)
+                if diff <= orb:
+                    conjunctions.append({
+                        "star":       name,
+                        "planet":     p["name"],
+                        "orb":        round(diff, 4),
+                        "applying":   _is_applying(p_speed, p_lon, star_lon),
+                        "star_lon":   round(star_lon, 4),
+                        "planet_lon": round(p_lon, 4),
+                    })
         except Exception as e:
-            print(f"[fixed_stars] {name}: {e}")
+            print("[fixed_stars] " + name + ": " + str(e))
             continue
-
-        star_lon = xx[0]
-        star_lat = xx[1]
-        star_dist = xx[2]
-
-        stars.append({
-            "name":      name,
-            "lon":       round(star_lon, 4),
-            "lat":       round(star_lat, 4),
-            "dist_pc":   round(star_dist, 4),
-            "zodiac_sign": _zodiac_sign(star_lon),
-        })
-
-        for p in planet_data:
-            p_lon   = p["longitude"]
-            p_speed = p["speed_deg_per_day"]
-            diff    = _angular_diff(p_lon, star_lon)
-            if diff <= orb:
-                conjunctions.append({
-                    "star":       name,
-                    "planet":     p["name"],
-                    "orb":        round(diff, 4),
-                    "applying":   _is_applying(p_speed, p_lon, star_lon),
-                    "star_lon":   round(star_lon, 4),
-                    "planet_lon": round(p_lon, 4),
-                })
 
     return {
         "meta": {
@@ -211,11 +210,11 @@ def get_sky_snapshot(
                      ("mc",  mc),  ("ic",  angles["ic"])]:
         try:
             xaz = swe.azalt(jd, swe.ECL2HOR, geopos, 1013.25, 15.0, [lon, 0.0, 1.0])
-            angles[f"{key}_az"]  = round(xaz[0], 2)
-            angles[f"{key}_alt"] = round(xaz[1], 2)
+            angles[key + "_az"]  = round(xaz[0], 2)
+            angles[key + "_alt"] = round(xaz[1], 2)
         except Exception:
-            angles[f"{key}_az"]  = 0.0
-            angles[f"{key}_alt"] = -90.0
+            angles[key + "_az"]  = 0.0
+            angles[key + "_alt"] = -90.0
 
     stars_data = _get_fixed_stars(jd, planets)
 
