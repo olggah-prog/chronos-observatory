@@ -70,9 +70,16 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
     for name in FIXED_STARS:
         try:
             ret, xx, serr = swe.fixstar2(name, jd, SIDEREAL_FLAG)
-            star_lon = ret[0]
-            star_lat = ret[1]
-            star_dist = ret[2]
+            if isinstance(ret, (list, tuple)) and len(ret) >= 3 and isinstance(ret[0], float):
+                star_lon = ret[0]
+                star_lat = ret[1]
+                star_dist = ret[2]
+            elif isinstance(xx, (list, tuple)) and len(xx) >= 3 and isinstance(xx[0], float):
+                star_lon = xx[0]
+                star_lat = xx[1]
+                star_dist = xx[2]
+            else:
+                continue
 
             stars.append({
                 "name":      name,
