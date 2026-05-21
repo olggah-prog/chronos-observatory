@@ -1,3 +1,7 @@
+
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -66,3 +70,12 @@ def debug_raw():
             results[name] = {"error": str(e)}
     return results
 
+
+# Serve frontend
+dist = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
+if os.path.exists(dist):
+    app.mount('/assets', StaticFiles(directory=os.path.join(dist, 'assets')), name='assets')
+    @app.get('/{full_path:path}')
+    def serve_frontend(full_path: str):
+        index = os.path.join(dist, 'index.html')
+        return FileResponse(index)
