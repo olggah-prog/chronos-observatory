@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+// Local dev: Vite proxy rewrites /api → http://localhost:8000
+// Production: set VITE_API_URL=https://your-app.railway.app
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
+
 export function useSkyData(datetime) {
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
@@ -17,7 +21,7 @@ export function useSkyData(datetime) {
     // Intentionally NOT clearing `data` — stale sky stays visible while we load
 
     try {
-      const url = dt ? `/api/sky?dt=${encodeURIComponent(dt)}` : '/api/sky'
+      const url = dt ? `${API_BASE}/sky?dt=${encodeURIComponent(dt)}` : `${API_BASE}/sky`
       const res = await fetch(url, { signal: ctrl.signal })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
