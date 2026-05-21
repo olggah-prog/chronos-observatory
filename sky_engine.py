@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from typing import Optional
 
+import os
 import swisseph as swe
 
+swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
 swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY)
 AYANAMSHA_NAME = "fagan_bradley"
 SIDEREAL_FLAG = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
