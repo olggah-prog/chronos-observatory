@@ -4,19 +4,21 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-0 \
     libsqlite3-dev \
     gcc \
+    curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Verify pyswisseph imported successfully at build time
 RUN python -c "import swisseph; print('swisseph OK')"
 
 COPY . .
 
-# Shell form so $PORT is expanded from Railway's runtime environment
+RUN cd frontend && npm install && npm run build
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-# force rebuild Thu May 21 13:02:58 CEST 2026
 
 ENV EPHE_PATH=/app/ephe
