@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { PLANET_META, ZODIAC_META } from '../utils/planets'
+import { ZODIAC_META } from '../utils/planets'
 
 const CX = 300, CY = 300
 const R = {
@@ -14,22 +14,87 @@ const R = {
   center:       28,
 }
 
-// Optical size table — equal visual weight, not equal px.
-// Venus ♀ and Mars ♂ have wide circle+stroke forms that dominate at 20px;
-// Moon ☽ and Neptune ♆ have thin strokes that need a touch more size.
-const PLANET_SIZE = {
-  Sun:     39,
-  Moon:    20,
-  Mercury: 19,
-  Venus:   17,
-  Mars:    17,
-  Jupiter: 19,
-  Saturn:  19,
-  Uranus:  20,
-  Neptune: 20,
-  Pluto:   19,
-  NNode:   19,
-  SNode:   19,
+// ── Custom SVG planet glyphs ─────────────────────────────────────────────────
+// All drawn in a ±8 coordinate space centred at (0,0).
+// Stroke props (width 1.2, round caps/joins, no fill) are set on the parent <g>.
+const GLYPHS = {
+  Sun: () => (<>
+    <circle r="6" />
+    <circle r="1.5" fill="rgba(225,228,235,0.90)" stroke="none" />
+  </>),
+
+  Moon: () => (
+    // Outer D-arc (right side) + inner concave arc = crescent outline
+    <path d="M 0,-6.5 A 6.5,6.5 0 0,1 0,6.5 A 4,6.5 0 0,0 0,-6.5 Z" />
+  ),
+
+  Mercury: () => (<>
+    <circle cy="-1.5" r="3.5" />
+    <line x1="0" y1="2" x2="0" y2="7" />
+    <line x1="-2.5" y1="5.2" x2="2.5" y2="5.2" />
+    <path d="M -3.5,-5.1 A 3.5,2 0 0,0 3.5,-5.1" />
+  </>),
+
+  Venus: () => (<>
+    <circle cy="-1.8" r="4" />
+    <line x1="0" y1="2.2" x2="0" y2="7" />
+    <line x1="-2.8" y1="5.2" x2="2.8" y2="5.2" />
+  </>),
+
+  Mars: () => (<>
+    <circle cx="-1.5" cy="2" r="4.2" />
+    <line x1="2" y1="-2" x2="6.5" y2="-6.5" />
+    <line x1="2.5" y1="-6.5" x2="6.5" y2="-6.5" />
+    <line x1="6.5" y1="-6.5" x2="6.5" y2="-2.5" />
+  </>),
+
+  Jupiter: () => (<>
+    <line x1="2.5" y1="7" x2="2.5" y2="-7" />
+    <line x1="-5.5" y1="1" x2="5" y2="1" />
+    <path d="M -5.5,1 A 3.5,6 0 0,1 2.5,-6.5" />
+  </>),
+
+  Saturn: () => (<>
+    <line x1="-0.5" y1="7" x2="-0.5" y2="-3" />
+    <path d="M -0.5,-3 A 4.5,3.5 0 0,1 5,1" />
+    <line x1="-4.5" y1="2.5" x2="3.5" y2="2.5" />
+  </>),
+
+  Uranus: () => (<>
+    <circle r="2.5" />
+    <line x1="-6.5" y1="0" x2="-2.5" y2="0" />
+    <line x1="2.5"  y1="0" x2="6.5"  y2="0" />
+    <line x1="-6.5" y1="0" x2="-6.5" y2="7" />
+    <line x1="6.5"  y1="0" x2="6.5"  y2="7" />
+    <line x1="0" y1="-2.5" x2="0" y2="-7" />
+  </>),
+
+  Neptune: () => (<>
+    <line x1="0" y1="7" x2="0" y2="-6" />
+    <line x1="-5.5" y1="2.5"  x2="5.5"  y2="2.5"  />
+    <line x1="-5.5" y1="2.5"  x2="-5.5" y2="-1.5" />
+    <line x1="5.5"  y1="2.5"  x2="5.5"  y2="-1.5" />
+    <path d="M -5.5,-1.5 A 5.5,5.5 0 0,1 5.5,-1.5" />
+  </>),
+
+  Pluto: () => (<>
+    <path d="M -4,-7 A 4,2 0 0,0 4,-7" />
+    <circle cy="0" r="3.5" />
+    <line x1="0" y1="3.5" x2="0" y2="7" />
+    <line x1="-2.5" y1="5.5" x2="2.5" y2="5.5" />
+  </>),
+
+  NNode: () => (<>
+    <path d="M -5.5,2 A 5.5,5.5 0 0,1 5.5,2" />
+    <circle cx="-5.5" cy="2"  r="1.5" fill="rgba(225,228,235,0.90)" stroke="none" />
+    <circle cx="5.5"  cy="2"  r="1.5" fill="rgba(225,228,235,0.90)" stroke="none" />
+  </>),
+
+  SNode: () => (<>
+    <path d="M -5.5,-2 A 5.5,5.5 0 0,0 5.5,-2" />
+    <circle cx="-5.5" cy="-2" r="1.5" fill="rgba(225,228,235,0.90)" stroke="none" />
+    <circle cx="5.5"  cy="-2" r="1.5" fill="rgba(225,228,235,0.90)" stroke="none" />
+  </>),
 }
 
 function lonXY(lon, r) {
@@ -101,8 +166,7 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
 
     return sorted.map((planet, i) => ({
       ...planet,
-      meta: PLANET_META[planet.name],
-      pos:  lonXY(planet.longitude, R.planet + offsets[i]),
+      pos: lonXY(planet.longitude, R.planet + offsets[i]),
     }))
   }, [planets])
 
@@ -254,23 +318,19 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
           </circle>
         ))}
 
-        {/* ── Planet + Node glyphs — bare symbol, white, no badge ── */}
+        {/* ── Planet + Node glyphs — custom SVG paths, uniform stroke ── */}
         {planetPositions.map(p => {
-          const sz = PLANET_SIZE[p.name] ?? 11
+          const GlyphFn = GLYPHS[p.name]
+          if (!GlyphFn) return null
           return (
-            <g key={p.name} filter="url(#wGlow)">
+            <g key={p.name}
+               transform={`translate(${p.pos.x},${p.pos.y})`}
+               stroke="rgba(225,228,235,0.90)" fill="none"
+               strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"
+               filter="url(#wGlow)">
               <title>{p.name} · {p.zodiac_sign} {p.longitude.toFixed(2)}°{p.retrograde ? ' ℞' : ''}</title>
-              {/* Invisible hit area — sized to match largest glyph */}
-              <circle cx={p.pos.x} cy={p.pos.y} r="13"
-                fill="transparent" style={{ cursor: 'default' }} />
-              <text
-                x={p.pos.x} y={p.pos.y}
-                textAnchor="middle" dominantBaseline="middle"
-                fontSize={sz}
-                fill="rgba(225,228,235,0.90)"
-                style={{ fontFamily: 'serif', fontWeight: 'normal', userSelect: 'none', pointerEvents: 'none', textRendering: 'geometricPrecision' }}>
-                {p.meta.symbol}
-              </text>
+              <circle r="13" fill="transparent" stroke="none" style={{ cursor: 'default' }} />
+              <GlyphFn />
             </g>
           )
         })}
