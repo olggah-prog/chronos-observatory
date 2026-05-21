@@ -69,7 +69,9 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
 
     for name in FIXED_STARS:
         try:
-            ret, xx, serr = swe.fixstar2(name, jd, SIDEREAL_FLAG)
+            ret, xx, serr = swe.fixstar2(name, jd, swe.FLG_SWIEPH | swe.FLG_SPEED)
+            ayan = swe.get_ayanamsa(jd)
+            ret = tuple([ret[0] - ayan] + list(ret[1:]))
             star_lon = float(ret[0])
             star_lat = float(ret[1])
             star_dist = float(ret[2])
