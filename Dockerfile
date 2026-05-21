@@ -17,3 +17,4 @@ COPY . .
 
 # Shell form so $PORT is expanded from Railway's runtime environment
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# force rebuild Thu May 21 13:02:58 CEST 2026
