@@ -17,8 +17,10 @@ RUN python -c "import swisseph; print('swisseph OK')"
 
 COPY . .
 
-RUN cd /app/frontend && npm install && npm run build
+WORKDIR /app/frontend
+RUN npm install && npm run build
 
+WORKDIR /app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 ENV EPHE_PATH=/app/ephe
