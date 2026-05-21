@@ -14,11 +14,22 @@ const R = {
   center:       28,
 }
 
-// Glyph sizes — no circle badge, just the classical symbol  (×1.5 from original)
+// Optical size table — equal visual weight, not equal px.
+// Venus ♀ and Mars ♂ have wide circle+stroke forms that dominate at 20px;
+// Moon ☽ and Neptune ♆ have thin strokes that need a touch more size.
 const PLANET_SIZE = {
-  Sun: 39, Moon: 21, Mercury: 21, Venus: 21, Mars: 21,
-  Jupiter: 21, Saturn: 21, Uranus: 21, Neptune: 21, Pluto: 21,
-  NNode: 21, SNode: 21,
+  Sun:     39,
+  Moon:    20,
+  Mercury: 19,
+  Venus:   17,
+  Mars:    17,
+  Jupiter: 19,
+  Saturn:  19,
+  Uranus:  20,
+  Neptune: 20,
+  Pluto:   19,
+  NNode:   19,
+  SNode:   19,
 }
 
 function lonXY(lon, r) {
@@ -68,11 +79,31 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
   const planetPositions = useMemo(() => {
     if (!planets.length) return []
     const sorted = [...planets].sort((a, b) => a.longitude - b.longitude)
-    return sorted.map((planet, i) => {
-      const nearby = sorted.filter((p, j) => j !== i && Math.abs(p.longitude - planet.longitude) < 9)
-      const rShift = nearby.length > 0 ? (i % 2 === 0 ? -18 : 16) : 0
-      return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(planet.longitude, R.planet + rShift) }
-    })
+    const offsets = new Array(sorted.length).fill(0)
+    const CLUSTER_DEG = 8   // planets within this arc are a cluster
+    const STEP        = 14  // radial px between tiers
+
+    // Find runs of planets within CLUSTER_DEG of the group's first member,
+    // then spread them symmetrically around R.planet along the radius.
+    let gs = 0
+    for (let i = 1; i <= sorted.length; i++) {
+      const done = i === sorted.length ||
+                   sorted[i].longitude - sorted[gs].longitude >= CLUSTER_DEG
+      if (done) {
+        const n = i - gs
+        if (n > 1) {
+          for (let k = 0; k < n; k++)
+            offsets[gs + k] = Math.round((k - (n - 1) / 2) * STEP)
+        }
+        gs = i
+      }
+    }
+
+    return sorted.map((planet, i) => ({
+      ...planet,
+      meta: PLANET_META[planet.name],
+      pos:  lonXY(planet.longitude, R.planet + offsets[i]),
+    }))
   }, [planets])
 
   // Axis pair data — full-diameter lines + labels with adaptive overlap offset
@@ -129,9 +160,9 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
         style={{ filter: 'drop-shadow(0 0 28px rgba(80,100,140,0.14))' }}
       >
         <defs>
-          {/* White glow — very soft, gives glyphs mass without neon */}
-          <filter id="wGlow" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur stdDeviation="1.4" result="blur"/>
+          {/* Subtle presence glow — just enough to separate glyphs from background */}
+          <filter id="wGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="0.7" result="blur"/>
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
           {/* Inner sky — deep navy, slightly warm at the edges */}
@@ -169,7 +200,7 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
               x={seg.labelPos.x} y={seg.labelPos.y}
               textAnchor="middle" dominantBaseline="middle"
               fontSize="21" fill="rgba(210,215,225,0.68)"
-              style={{ fontFamily: 'serif', userSelect: 'none' }}>
+              style={{ fontFamily: 'serif', fontWeight: 'normal', userSelect: 'none', textRendering: 'geometricPrecision' }}>
               {seg.symbol}
             </text>
           </g>
@@ -237,7 +268,7 @@ export default function ZodiacWheel({ planets = [], angles = null }) {
                 textAnchor="middle" dominantBaseline="middle"
                 fontSize={sz}
                 fill="rgba(225,228,235,0.90)"
-                style={{ fontFamily: 'serif', userSelect: 'none', pointerEvents: 'none' }}>
+                style={{ fontFamily: 'serif', fontWeight: 'normal', userSelect: 'none', pointerEvents: 'none', textRendering: 'geometricPrecision' }}>
                 {p.meta.symbol}
               </text>
             </g>
