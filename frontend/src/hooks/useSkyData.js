@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 // Local dev: Vite proxy rewrites /api → http://localhost:8000
 // Production: set VITE_API_URL=https://your-app.railway.app
-const API_BASE = import.meta.env.VITE_API_URL || '/api'
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 export function useSkyData(datetime) {
   const [data, setData]       = useState(null)
