@@ -70,9 +70,9 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
     for name in FIXED_STARS:
         try:
             ret, xx, serr = swe.fixstar2(name, jd, SIDEREAL_FLAG)
-            star_lon = xx[0]
-            star_lat = xx[1]
-            star_dist = xx[2]
+            star_lon = ret[0]
+            star_lat = ret[1]
+            star_dist = ret[2]
 
             stars.append({
                 "name":      name,
