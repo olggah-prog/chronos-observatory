@@ -45,3 +45,23 @@ def sky(
             )
 
     return get_sky_snapshot(parsed_dt, observer_lat=lat, observer_lon=lon)
+
+@app.get("/debug/raw")
+def debug_raw():
+    import swisseph as swe, os
+    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
+    swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY)
+    flag = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
+    results = {}
+    for name in ["Aldebaran", "Regulus", "Spica"]:
+        try:
+            a, b, c = swe.fixstar2(name, 2451545.0, flag)
+            results[name] = {
+                "a_type": str(type(a)),
+                "a_val": str(a)[:80],
+                "b_type": str(type(b)),
+                "b_val": str(b)[:80],
+            }
+        except Exception as e:
+            results[name] = {"error": str(e)}
+    return results
