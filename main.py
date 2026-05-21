@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/api")
 def root():
     return {"service": "Chronos Observatory", "version": "1.0.0"}
 
