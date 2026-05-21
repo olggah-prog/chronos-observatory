@@ -66,13 +66,3 @@ def debug_raw():
             results[name] = {"error": str(e)}
     return results
 
-@app.get("/debug-star")
-def debug_star(name: str = "Aldebaran"):
-    import swisseph as swe, os
-    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
-    jd = swe.julday(2026, 5, 21, 12.0)
-    try:
-        ret, xx, serr = swe.fixstar2(name, jd, swe.FLG_SWIEPH | swe.FLG_SPEED)
-        return {"ok": True, "ret": list(ret), "serr": serr}
-    except Exception as e:
-        return {"ok": False, "error": str(e), "ephe_path": os.getenv("EPHE_PATH", "/app/ephe")}
