@@ -166,7 +166,7 @@ export default function App() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-center">
               <div>
                 <SystemsDropdown showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
-                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions}/>
+                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
               </div>
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
