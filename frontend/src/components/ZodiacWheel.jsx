@@ -216,7 +216,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
               <g key={s.name}>
                 <title>{s.name} {s.lon.toFixed(2)}</title>
                 <circle cx={s.pos.x} cy={s.pos.y} r={isActive ? 5.5 : 3.8}
-                  fill="none" stroke="rgba(255,252,220,0.07)" strokeWidth="0.6"/>
+                  fill="none" stroke="rgba(255,252,220,0.04)" strokeWidth="0.5"/>
                 {isActive && (
                   <circle cx={s.pos.x} cy={s.pos.y} r="7" fill="none"
                     stroke="rgba(255,240,140,0.30)" strokeWidth="0.7">
@@ -226,7 +226,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
                 )}
                 <circle cx={s.pos.x} cy={s.pos.y}
                   r={isActive ? 3.0 : 2.0}
-                  fill={isActive ? 'rgba(255,250,210,0.95)' : 'rgba(255,248,200,0.55)'}/>
+                  fill={isActive ? 'rgba(255,250,210,0.95)' : 'rgba(255,248,200,0.38)'}/>
                 {isActive && (
                   <text x={lonXY(s.lon, R.starRing + 9).x} y={lonXY(s.lon, R.starRing + 9).y}
                     textAnchor={rimAnchor(lonXY(s.lon, R.starRing + 9))} dominantBaseline="middle"
@@ -288,6 +288,12 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         <line x1={CX-18} y1={CY} x2={CX+18} y2={CY} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
         <line x1={CX} y1={CY-18} x2={CX} y2={CY+18} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
         <circle cx={CX} cy={CY} r="2.0" fill="rgba(205,190,145,0.85)"/>
+
+        <text x={CX} y={CY + R.outerRim + 26} textAnchor="middle"
+          fontSize="6.5" fill="rgba(160,175,200,0.35)"
+          style={{ fontFamily: 'monospace', letterSpacing: '0.18em' }}>
+          SYMBOLIC SKY · SIDEREAL MODE
+        </text>
       </svg>
     </div>
   )
