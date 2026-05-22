@@ -89,19 +89,9 @@ export default function SystemsDropdown({ showPlanets = true, showStars = true, 
         }}>
           {/* Active */}
           <div style={{ marginBottom: '14px' }}>
-            {ACTIVE.map(name => (
-              <div key={name} style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                marginBottom: '6px',
-                fontFamily: 'monospace',
-                fontSize: '9px',
-                letterSpacing: '0.12em',
-                color: 'rgba(215,225,238,0.82)',
-                cursor: 'default',
-              }}>
-                <span style={{ color: 'rgba(100,200,140,0.75)', fontSize: '8px' }}>✓</span>
-                {name}
-              </div>
+            <ActiveRow label="Planets"     on={showPlanets} onToggle={onTogglePlanets}/>
+            <ActiveRow label="Fixed Stars" on={showStars}   onToggle={onToggleStars}/>
+          </div>
             ))}
           </div>
 
