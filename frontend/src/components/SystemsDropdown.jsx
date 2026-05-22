@@ -28,14 +28,16 @@ export default function SystemsDropdown() {
           padding: '0',
           cursor: 'pointer',
           fontFamily: 'monospace',
-          fontSize: '8px',
-          letterSpacing: '0.30em',
-          color: open ? 'rgba(200,212,230,0.60)' : 'rgba(160,175,200,0.38)',
+          fontSize: '9.5px',
+          letterSpacing: '0.28em',
+          color: open ? 'rgba(210,222,238,0.82)' : 'rgba(185,200,220,0.62)',
           textTransform: 'uppercase',
           transition: 'color 0.2s',
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '8px',
+          padding: '4px 10px 4px 0',
+          borderBottom: open ? '1px solid rgba(180,200,230,0.15)' : '1px solid transparent',
         }}>
         SIDEREAL SYMBOLIC SKY
         <span style={{

@@ -161,7 +161,7 @@ export default function App() {
 
         {data && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6 items-start">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
               <div>
                 <SystemsDropdown />
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions}/>
