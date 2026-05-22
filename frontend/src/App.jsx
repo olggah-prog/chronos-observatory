@@ -5,7 +5,7 @@ import VisibleSkyMap     from './components/VisibleSkyMap'
 import PlanetCard        from './components/PlanetCard'
 import TimelineSlider    from './components/TimelineSlider'
 import FixedStarContacts from './components/FixedStarContacts'
-import LayerPanel        from './components/LayerPanel'
+import SystemsDropdown   from './components/SystemsDropdown'
 
 function StarField() {
   const stars = useMemo(() =>
@@ -162,12 +162,9 @@ export default function App() {
         {data && (
           <>
             <div className="grid grid-cols-1 xl:grid-cols-[460px_1fr] gap-6 items-start">
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
-                <LayerPanel />
-                <div style={{ flex: 1 }}>
-                  <div className="text-[9px] tracking-[0.4em] text-slate-600 mb-3 uppercase">Ecliptic Projection</div>
-                  <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions}/>
-                </div>
+              <div>
+                <SystemsDropdown />
+                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions}/>
               </div>
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
