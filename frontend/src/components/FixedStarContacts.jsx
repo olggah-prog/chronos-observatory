@@ -1,3 +1,4 @@
+import React from 'react'
 const PLANET_SYMBOL = {
   Sun: '☉', Moon: '☽', Mercury: '☿', Venus: '♀', Mars: '♂',
   Jupiter: '♃', Saturn: '♄', Uranus: '♅', Neptune: '♆', Pluto: '♇',
@@ -5,23 +6,31 @@ const PLANET_SYMBOL = {
 }
 
 export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', ayanamsha_value = null }) {
+  const [open, setOpen] = React.useState(false)
   const empty = !conjunctions || conjunctions.length === 0
+  const count = conjunctions?.length ?? 0
   return (
-    <div style={{ border: '1px solid rgba(14,165,233,0.12)', background: 'rgba(2,8,18,0.70)', borderRadius: '6px', padding: '16px 20px', minHeight: '160px' }}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[9px] tracking-[0.4em] text-slate-600 uppercase">Fixed Star Contacts</span>
-        {ayanamsha && ayanamsha_value != null && (
-          <span className="text-[8px] tracking-[0.2em] text-slate-700 uppercase font-mono">
-            {ayanamsha} · {ayanamsha_value.toFixed(4)}°
-          </span>
-        )}
+    <div style={{ border: '1px solid rgba(14,165,233,0.12)', background: 'rgba(2,8,18,0.70)', borderRadius: '6px', padding: '16px 20px', minHeight: open ? '160px' : 'auto' }}>
+      <div className="flex items-center justify-between mb-3 cursor-pointer select-none"
+        onClick={() => setOpen(o => !o)}>
+        <span className="text-[9px] tracking-[0.4em] text-slate-600 uppercase">
+          Fixed Star Contacts {count > 0 && <span className="text-amber-400/60 ml-1">{count}</span>}
+        </span>
+        <div className="flex items-center gap-3">
+          {ayanamsha && ayanamsha_value != null && (
+            <span className="text-[8px] tracking-[0.2em] text-slate-700 uppercase font-mono">
+              {ayanamsha} · {ayanamsha_value.toFixed(4)}°
+            </span>
+          )}
+          <span className="text-[8px] text-slate-700">{open ? '▲' : '▼'}</span>
+        </div>
       </div>
       <div className="grid gap-2 pb-1 mb-1" style={{ gridTemplateColumns: '24px 1fr 1fr 52px 80px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         {['', 'Planet', 'Star', 'Orb', 'Mode'].map((h, i) => (
           <span key={i} className="text-[8px] tracking-[0.25em] text-slate-700 uppercase">{h}</span>
         ))}
       </div>
-      {empty ? (
+      {open && (empty ? (
         <div style={{ color: "rgba(100,120,150,0.35)", fontSize: "9px", letterSpacing: "0.2em", fontFamily: "monospace", paddingTop: "8px" }}>NO ACTIVE CONTACTS</div>
       ) : (
       <div className="space-y-0.5" style={{ maxHeight: "200px", overflowY: "auto" }}>
@@ -44,7 +53,7 @@ export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', a
           )
         })}
       </div>
-      )}
+      ))}
     </div>
   )
 }
