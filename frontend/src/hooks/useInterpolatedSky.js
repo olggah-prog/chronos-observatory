@@ -1,83 +1,86 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
-const INTERP_MS = 900  // duration of sky drift animation
-const EASE_EXP  = 2.5  // easing exponent — higher = slower start, faster end
+const INTERP_MS = 1200
 
-function easeInOut(t) {
-  // Smooth cubic easing: slow start, slow end
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+function easeOut(t) {
+  return 1 - Math.pow(1 - Math.min(t, 1), 3)
 }
 
 function lerpAngle(a, b, t) {
-  // Shortest arc interpolation for ecliptic longitude (0–360)
   let diff = ((b - a + 540) % 360) - 180
   return (a + diff * t + 360) % 360
 }
 
-function interpolatePlanets(prev, next, t) {
-  if (!prev || !next) return next
-  const et = easeInOut(Math.min(t, 1))
-  return next.map(p => {
-    const prevP = prev.find(pp => pp.name === p.name)
-    if (!prevP) return p
-    return { ...p, longitude: lerpAngle(prevP.longitude, p.longitude, et) }
+function lerpPlanets(from, to, t) {
+  if (!from || !to) return to
+  return to.map(p => {
+    const fp = from.find(q => q.name === p.name)
+    if (!fp) return p
+    return { ...p, longitude: lerpAngle(fp.longitude, p.longitude, t) }
   })
 }
 
-function interpolateAngles(prev, next, t) {
-  if (!prev || !next) return next
-  const et = easeInOut(Math.min(t, 1))
+function lerpAngles(from, to, t) {
+  if (!from || !to) return to
   return {
-    asc: lerpAngle(prev.asc, next.asc, et),
-    dsc: lerpAngle(prev.dsc, next.dsc, et),
-    mc:  lerpAngle(prev.mc,  next.mc,  et),
-    ic:  lerpAngle(prev.ic,  next.ic,  et),
+    asc: lerpAngle(from.asc, to.asc, t),
+    dsc: lerpAngle(from.dsc, to.dsc, t),
+    mc:  lerpAngle(from.mc,  to.mc,  t),
+    ic:  lerpAngle(from.ic,  to.ic,  t),
   }
 }
 
-// Takes raw data from useSkyData and returns smoothly interpolated version
 export function useInterpolatedSky(rawData) {
-  const [displayed, setDisplayed] = useState(rawData)
-  const prevRef    = useRef(null)
-  const targetRef  = useRef(null)
-  const startRef   = useRef(null)
-  const rafRef     = useRef(null)
+  // displayedRef holds the CURRENT visually rendered snapshot (mutable, no re-render)
+  const displayedRef = useRef(null)
+  const [displayed, setDisplayed] = useState(null)
+
+  const targetRef   = useRef(null)  // latest rawData we're animating toward
+  const startRef    = useRef(null)  // when current animation started
+  const fromRef     = useRef(null)  // snapshot of displayed at animation start
+  const rafRef      = useRef(null)
+
+  const animate = useCallback(() => {
+    const now = performance.now()
+    const t   = easeOut((now - startRef.current) / INTERP_MS)
+    const done = t >= 1
+
+    const next = {
+      ...targetRef.current,
+      planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
+      angles:  lerpAngles(fromRef.current?.angles,  targetRef.current.angles,  done ? 1 : t),
+    }
+
+    displayedRef.current = next
+    setDisplayed(next)
+
+    if (!done) {
+      rafRef.current = requestAnimationFrame(animate)
+    }
+  }, [])
 
   useEffect(() => {
     if (!rawData) return
 
-    // First load — no animation
-    if (!prevRef.current) {
-      prevRef.current = rawData
+    // First load — instant, no animation
+    if (!displayedRef.current) {
+      displayedRef.current = rawData
+      targetRef.current    = rawData
       setDisplayed(rawData)
       return
     }
 
-    // New data arrived — start interpolation
+    // New target arrived — animate FROM current displayed position
+    // This prevents backward jumps: we always start from where we ARE visually
+    cancelAnimationFrame(rafRef.current)
+    fromRef.current   = displayedRef.current  // snapshot current visual state
     targetRef.current = rawData
     startRef.current  = performance.now()
-    const from = prevRef.current
 
-    cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(animate)
 
-    function tick(now) {
-      const t = (now - startRef.current) / INTERP_MS
-      if (t >= 1) {
-        prevRef.current = rawData
-        setDisplayed(rawData)
-        return
-      }
-      setDisplayed({
-        ...rawData,
-        planets: interpolatePlanets(from.planets, rawData.planets, t),
-        angles:  interpolateAngles(from.angles, rawData.angles, t),
-      })
-      rafRef.current = requestAnimationFrame(tick)
-    }
-
-    rafRef.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafRef.current)
-  }, [rawData])
+  }, [rawData, animate])
 
   return displayed
 }
