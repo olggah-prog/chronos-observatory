@@ -112,8 +112,9 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
           {labelFromOffset(offset, todayRef.current)}
         </div>
       </div>
-      <div>
-        <input type="range" min={-PAST_DAYS} max={FUTURE_DAYS}
+    </div>
+    <div>
+      <input type="range" min={-PAST_DAYS} max={FUTURE_DAYS}
           value={offset} onInput={handleSlider} onChange={handleSlider}
           className="w-full"/>
       </div>
