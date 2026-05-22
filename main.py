@@ -93,11 +93,19 @@ def debug_stars():
 
 @app.get("/debug-stars2")
 def debug_stars2():
-    from sky_engine import _get_fixed_stars
-    import swisseph as swe
+    import swisseph as swe, os
+    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
     jd = swe.julday(2026, 5, 22, 9.0)
-    result = _get_fixed_stars(jd, [])
-    return {"stars_count": len(result["stars"]), "stars": [s["name"] for s in result["stars"]]}
+    results = {}
+    for name in ["Aldebaran","Regulus","Antares","Spica","Sirius"]:
+        try:
+            ret, xx, serr = swe.fixstar2(name, jd, swe.FLG_SWIEPH | swe.FLG_SPEED)
+            ayan = swe.get_ayanamsa(jd)
+            ret2 = tuple([ret[0] - ayan] + list(ret[1:]))
+            results[name] = {"ok": True, "lon": round(float(ret2[0]), 4), "serr": serr}
+        except Exception as e:
+            results[name] = {"ok": False, "error": str(e), "type": type(e).__name__}
+    return results
 
 
     @app.get('/{full_path:path}')
