@@ -200,7 +200,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         })}
 
         <circle cx={CX} cy={CY} r={R.starRing} fill="none"
-          stroke="rgba(255,245,180,0.06)" strokeWidth="0.5"/>
+          stroke="rgba(255,245,180,0.18)" strokeWidth="0.6" strokeDasharray="1 6"/>
 
         {axisPairs.map(pair => (
           <line key={pair.key}
