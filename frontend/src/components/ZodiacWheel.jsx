@@ -79,7 +79,7 @@ function AxisArrow({ lon, label, endR, lblR, lyOff = 0, minor = false }) {
   )
 }
 
-export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [] }) {
+export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true }) {
   const segments = useMemo(() =>
     ZODIAC_META.map((sign, i) => ({
       ...sign,
@@ -231,7 +231,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             stroke={pair.key === 'mc-ic' ? 'rgba(190,205,225,0.18)' : 'rgba(210,220,232,0.26)'} strokeWidth="0.5" strokeDasharray={pair.dash}/>
         ))}
 
-        <g filter="url(#starGlow)">
+        <g filter="url(#starGlow)" style={{ display: showStars ? 'block' : 'none' }}>
           {starPositions.map(s => {
             const isActive = conjStarNames.has(s.name)
             const labelPt  = lonXY(s.lon, R.starRing + 12)
@@ -264,7 +264,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           })}
         </g>
 
-        {(conjunctions ?? []).map((c, i) => {
+        {showStars && (conjunctions ?? []).map((c, i) => {
           const planet = planetPositions.find(p => p.name === c.planet)
           const star   = starPositions.find(s => s.name === c.star)
           if (!planet || !star || c.orb > 2.0) return null
@@ -277,14 +277,14 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           )
         })}
 
-        {planetPositions.filter(p => p.retrograde).map(p => (
+        {showPlanets && planetPositions.filter(p => p.retrograde).map(p => (
           <circle key={`rx-${p.name}`} cx={p.pos.x} cy={p.pos.y} r={10}
             fill="none" stroke="rgba(190,198,212,0.32)" strokeWidth="0.55" strokeDasharray="2 3.5">
             <animate attributeName="opacity" values="0.32;0.05;0.32" dur="4.5s" repeatCount="indefinite"/>
           </circle>
         ))}
 
-        <g filter="url(#pGlow)">
+        <g filter="url(#pGlow)" style={{ display: showPlanets ? 'block' : 'none' }}>
           {planetPositions.map(p => {
             const sz = PLANET_SIZE[p.name] ?? 18
             return (

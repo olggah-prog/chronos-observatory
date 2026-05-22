@@ -6,7 +6,31 @@ const ANCIENT = ['Egyptian', 'Maya', 'Chinese', 'Jyotisha', 'Babylonian', 'Kabba
 
 const EXPERIMENTAL = ['Synchro', 'Resonance', 'Parans']
 
-export default function SystemsDropdown() {
+
+function ActiveRow({ label, on, onToggle }) {
+  return (
+    <div onClick={onToggle} style={{
+      display: 'flex', alignItems: 'center', gap: '8px',
+      marginBottom: '6px',
+      fontFamily: 'monospace',
+      fontSize: '9px',
+      letterSpacing: '0.12em',
+      color: on ? 'rgba(215,225,238,0.82)' : 'rgba(140,158,182,0.38)',
+      cursor: 'pointer',
+      userSelect: 'none',
+      transition: 'color 0.2s',
+    }}>
+      <span style={{
+        color: on ? 'rgba(100,200,140,0.75)' : 'rgba(140,158,182,0.25)',
+        fontSize: '8px',
+        transition: 'color 0.2s',
+      }}>{on ? '✓' : '○'}</span>
+      {label}
+    </div>
+  )
+}
+
+export default function SystemsDropdown({ showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
