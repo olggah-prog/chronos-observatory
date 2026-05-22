@@ -42,22 +42,36 @@ function rimAnchor(pt) {
   return 'middle'
 }
 
-function AxisArrow({ lon, label, endR, lblR, lyOff = 0 }) {
+function AxisArrow({ lon, label, endR, lblR, lyOff = 0, minor = false }) {
   const tip  = lonXY(lon, endR)
-  const base = lonXY(lon, endR + 9)
+  const base = lonXY(lon, endR + 12)
   const dx = tip.x - base.x, dy = tip.y - base.y
   const len = Math.sqrt(dx*dx + dy*dy) || 1
   const nx = dx/len, ny = dy/len
   const px = -ny, py = nx
-  const a1x = (base.x + px*3).toFixed(2), a1y = (base.y + py*3).toFixed(2)
-  const a2x = (base.x - px*3).toFixed(2), a2y = (base.y - py*3).toFixed(2)
+  const a1x = (base.x + px*1.8).toFixed(2), a1y = (base.y + py*1.8).toFixed(2)
+  const a2x = (base.x - px*1.8).toFixed(2), a2y = (base.y - py*1.8).toFixed(2)
   const lp  = lonXY(lon, lblR)
+  const arrowFill  = minor ? "rgba(180,195,215,0.32)" : "rgba(210,218,228,0.45)"
+  const textFill   = minor ? "rgba(170,185,210,0.48)" : "rgba(200,210,225,0.72)"
+  const fontSize   = minor ? "9.5" : "11"
+  // small radial ticks around axis point
+  const ticks = [-4, -2, 2, 4].map(off => {
+    const inner = lonXY(lon + off, endR - 1)
+    const outer = lonXY(lon + off, endR + 3)
+    return { inner, outer, key: off }
+  })
   return (
     <g>
+      {ticks.map(t => (
+        <line key={t.key}
+          x1={t.inner.x} y1={t.inner.y} x2={t.outer.x} y2={t.outer.y}
+          stroke="rgba(200,210,225,0.18)" strokeWidth="0.4"/>
+      ))}
       <polygon points={`${tip.x},${tip.y} ${a1x},${a1y} ${a2x},${a2y}`}
-        fill="rgba(210,218,228,0.65)"/>
+        fill={arrowFill}/>
       <text x={lp.x} y={lp.y + lyOff} textAnchor={rimAnchor(lp)} dominantBaseline="middle"
-        fontSize="10.5" fill="rgba(200,210,225,0.72)"
+        fontSize={fontSize} fill={textFill}
         style={{ fontFamily: 'Orbitron, monospace', letterSpacing: '0.08em' }}>
         {label}
       </text>
@@ -110,8 +124,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     const items = [
       { lon: angles.asc, label: 'ASC' },
       { lon: angles.dsc, label: 'DSC' },
-      { lon: angles.mc,  label: 'MC'  },
-      { lon: angles.ic,  label: 'IC'  },
+      { lon: angles.mc,  label: 'MC', minor: true  },
+      { lon: angles.ic,  label: 'IC', minor: true  },
     ].map(a => ({ ...a, endR, lblR, lyOff: 0 }))
     for (let i = 0; i < items.length; i++) {
       for (let j = i + 1; j < items.length; j++) {
@@ -205,7 +219,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         {axisPairs.map(pair => (
           <line key={pair.key}
             x1={pair.p1.x} y1={pair.p1.y} x2={pair.p2.x} y2={pair.p2.y}
-            stroke="rgba(210,220,232,0.35)" strokeWidth="0.7" strokeDasharray={pair.dash}/>
+            stroke={pair.key === 'mc-ic' ? 'rgba(190,205,225,0.18)' : 'rgba(210,220,232,0.26)'} strokeWidth="0.5" strokeDasharray={pair.dash}/>
         ))}
 
         <g filter="url(#starGlow)">
@@ -280,7 +294,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
 
         {axisPoints.map(a => (
           <AxisArrow key={a.label} lon={a.lon} label={a.label}
-            endR={a.endR} lblR={a.lblR} lyOff={a.lyOff}/>
+            endR={a.endR} lblR={a.lblR} lyOff={a.lyOff} minor={a.minor}/>
         ))}
 
         <circle cx={CX} cy={CY} r={R.center} fill="#030911" stroke="rgba(255,255,255,0.08)" strokeWidth="0.45"/>
