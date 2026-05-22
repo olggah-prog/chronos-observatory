@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 
 const PAST_DAYS        = 365
 const FUTURE_DAYS      = 30
-const API_DEBOUNCE_MS  = 350
+const API_DEBOUNCE_MS  = 100
 const PLAY_INTERVAL_MS = 400
 
 function offsetDate(base, days) {

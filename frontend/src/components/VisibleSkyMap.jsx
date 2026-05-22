@@ -315,7 +315,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               return (
                 <g key={p.name} opacity={p.visible ? 1 : 0.09}
                   transform={`translate(${p.x},${p.y})`}
-                  style={{ transition: 'transform 0.9s cubic-bezier(0.25,0.1,0.25,1)' }}>
+                  style={{ transition: 'transform 1.4s cubic-bezier(0.25,0.1,0.25,1)' }}>
                   <title>
                     {`${p.name}  ·  alt ${p.altitude.toFixed(1)}°  ·  az ${p.azimuth.toFixed(1)}° (S-ref)`}
                     {p.illumination_pct != null ? `  ·  ${p.illumination_pct.toFixed(0)}% lit` : ''}
