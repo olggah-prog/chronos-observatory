@@ -10,7 +10,7 @@ export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', a
   const empty = !conjunctions || conjunctions.length === 0
   const count = conjunctions?.length ?? 0
   return (
-    <div style={{ border: '1px solid rgba(14,165,233,0.12)', background: 'rgba(2,8,18,0.70)', borderRadius: '6px', padding: '16px 20px', minHeight: open ? '160px' : 'auto' }}>
+    <div style={{ border: '1px solid rgba(14,165,233,0.18)', background: 'rgba(5,14,26,0.55)', borderRadius: '4px', padding: '12px 20px', minHeight: 'auto' }}>
       <div className="flex items-center justify-between mb-3 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}>
         <span className="text-[9px] tracking-[0.4em] text-slate-600 uppercase">

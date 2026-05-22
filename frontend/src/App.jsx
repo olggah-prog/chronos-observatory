@@ -14,7 +14,7 @@ function StarField() {
       id: i,
       x:   +((Math.sin(i * 7.391) * 0.5 + 0.5) * 100).toFixed(2),
       y:   +((Math.cos(i * 11.73) * 0.5 + 0.5) * 100).toFixed(2),
-      r:   +((Math.abs(Math.sin(i * 3.17)) * 1.1 + 0.3)).toFixed(2),
+      r:   +((Math.abs(Math.sin(i * 3.17)) * 0.55 + 0.15)).toFixed(2),
       op:  +((Math.abs(Math.sin(i * 5.93)) * 0.55 + 0.2)).toFixed(2),
       dur: +((Math.abs(Math.sin(i * 2.31)) * 4 + 2)).toFixed(1),
     })), [])
