@@ -24,7 +24,7 @@ function labelFromOffset(offset, today) {
   }) + ' UTC'
 }
 
-export default function TimelineSlider({ value, onChange, onSeek }) {
+export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }) {
   const [offset, setOffset]   = useState(0)
   const [playing, setPlaying] = useState(false)
 
@@ -51,6 +51,7 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
     clearInterval(playRef.current)
     clearTimeout(debounceRef.current)
     setPlaying(false)
+    onPlayChange?.(false)
     setOffset(0)
     onChange('')
   }
@@ -59,9 +60,11 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
     if (playing) {
       clearInterval(playRef.current)
       setPlaying(false)
+      onPlayChange?.(false)
       return
     }
     setPlaying(true)
+    onPlayChange?.(true)
     playRef.current = setInterval(() => {
       setOffset(prev => {
         const next = prev >= FUTURE_DAYS ? -PAST_DAYS : prev + 1

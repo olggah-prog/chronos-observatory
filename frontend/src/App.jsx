@@ -83,6 +83,7 @@ function LoadingBar() {
 export default function App() {
   const [selectedDt, setSelectedDt] = useState('')
   const [seeking, setSeeking]       = useState(false)
+  const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
@@ -105,7 +106,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout">
       <div className="fixed inset-0 pointer-events-none select-none"><StarField /></div>
-      {(seeking || loading) && data && <LoadingBar />}
+      {(seeking || loading) && data && !isPlaying && <LoadingBar />}
 
       <header className="relative z-10 border-b border-cyan-900/30 bg-[#020812]/85 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-5 py-4">
@@ -173,7 +174,7 @@ export default function App() {
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
 
-            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking}/>
+            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
 
             <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
             <TelemetryPanel planets={data.planets}/>

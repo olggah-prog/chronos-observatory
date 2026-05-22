@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-const INTERP_MS = 1100
+const INTERP_MS = 900
 
 function easeOut(t) {
   return 1 - Math.pow(1 - Math.min(t, 1), 3)
@@ -10,12 +10,18 @@ function lerp(a, b, t) {
   return a + (b - a) * t
 }
 
-// Interpolates ONLY screen x/y positions.
-// All other fields (visibility, altitude, azimuth, above_horizon)
-// come directly from latest API data — never interpolated.
-export function useInterpolatedBodies(rawBodies) {
+// Azimuth-aware X interpolation: detects wraparound (359→0)
+// and skips animation for that frame instead of dragging across screen
+function lerpX(prevX, targetX, t, screenWidth) {
+  const diff = Math.abs(targetX - prevX)
+  // If jump is more than half screen width — it's a wraparound, snap instantly
+  if (diff > screenWidth * 0.45) return targetX
+  return lerp(prevX, targetX, t)
+}
+
+export function useInterpolatedBodies(rawBodies, screenWidth = 900) {
   const displayedRef  = useRef(null)
-  const prevXYRef     = useRef({})   // name → {x, y} of last rendered position
+  const prevXYRef     = useRef({})
   const [displayed, setDisplayed] = useState(rawBodies)
 
   const targetRef = useRef(rawBodies)
@@ -30,14 +36,13 @@ export function useInterpolatedBodies(rawBodies) {
       const prev = prevXYRef.current[p.name]
       if (!prev) return p
       return {
-        ...p,                          // all non-position fields: latest from API
-        x: lerp(prev.x, p.x, done ? 1 : t),
+        ...p,
+        x: lerpX(prev.x, p.x, done ? 1 : t, screenWidth),
         y: lerp(prev.y, p.y, done ? 1 : t),
       }
     })
 
     if (done) {
-      // Store final positions as prev for next animation
       const xy = {}
       targetRef.current.forEach(p => { xy[p.name] = { x: p.x, y: p.y } })
       prevXYRef.current = xy
@@ -47,7 +52,7 @@ export function useInterpolatedBodies(rawBodies) {
     setDisplayed(next)
 
     if (!done) rafRef.current = requestAnimationFrame(animate)
-  }, [])
+  }, [screenWidth])
 
   useEffect(() => {
     if (!rawBodies?.length) return
@@ -55,16 +60,14 @@ export function useInterpolatedBodies(rawBodies) {
     targetRef.current = rawBodies
 
     if (!displayedRef.current?.length) {
-      // First load — instant, store positions
       const xy = {}
       rawBodies.forEach(p => { xy[p.name] = { x: p.x, y: p.y } })
-      prevXYRef.current   = xy
+      prevXYRef.current    = xy
       displayedRef.current = rawBodies
       setDisplayed(rawBodies)
       return
     }
 
-    // Snapshot current interpolated positions as start of next animation
     const xy = {}
     displayedRef.current.forEach(p => { xy[p.name] = { x: p.x, y: p.y } })
     prevXYRef.current = xy
