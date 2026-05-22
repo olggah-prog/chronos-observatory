@@ -168,15 +168,22 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             return (
               <g key={s.name}>
                 <title>{s.name} · {s.lon.toFixed(2)}°</title>
+                <circle cx={s.pos.x} cy={s.pos.y} r={isActive ? 5.5 : 4.0}
+                  fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
                 {isActive && (
-                  <circle cx={s.pos.x} cy={s.pos.y} r="4.5" fill="none"
-                    stroke="rgba(255,240,160,0.30)" strokeWidth="0.6">
-                    <animate attributeName="opacity" values="0.30;0.06;0.30" dur="3.5s" repeatCount="indefinite"/>
+                  <circle cx={s.pos.x} cy={s.pos.y} r="6" fill="none"
+                    stroke="rgba(255,240,160,0.45)" strokeWidth="0.8">
+                    <animate attributeName="opacity" values="0.45;0.10;0.45" dur="3.5s" repeatCount="indefinite"/>
                   </circle>
                 )}
                 <circle cx={s.pos.x} cy={s.pos.y}
-                  r={isActive ? 2.0 : 1.5}
-                  fill={isActive ? 'rgba(255,245,190,0.80)' : 'rgba(255,245,200,0.40)'}/>
+                  r={isActive ? 3.5 : 2.5}
+                  fill={isActive ? 'rgba(255,248,200,1.0)' : 'rgba(255,245,200,0.75)'}/>
+                {isActive && (
+                  <text x={s.pos.x + 5} y={s.pos.y - 4}
+                    fontSize="6" fill="rgba(255,240,160,0.85)"
+                    fontFamily="monospace" letterSpacing="0.5">{s.name}</text>
+                )}
               </g>
             )
           })}
