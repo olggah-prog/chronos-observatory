@@ -30,15 +30,16 @@ function lerpAngles(from, to, t) {
   }
 }
 
-export function useInterpolatedSky(rawData) {
-  // displayedRef holds the CURRENT visually rendered snapshot (mutable, no re-render)
+// rawData — latest API response
+// seekDt  — live drag target (string ISO or '') for instant visual feedback
+export function useInterpolatedSky(rawData, seekDt) {
   const displayedRef = useRef(null)
   const [displayed, setDisplayed] = useState(null)
 
-  const targetRef   = useRef(null)  // latest rawData we're animating toward
-  const startRef    = useRef(null)  // when current animation started
-  const fromRef     = useRef(null)  // snapshot of displayed at animation start
-  const rafRef      = useRef(null)
+  const targetRef  = useRef(null)
+  const startRef   = useRef(null)
+  const fromRef    = useRef(null)
+  const rafRef     = useRef(null)
 
   const animate = useCallback(() => {
     const now = performance.now()
@@ -59,26 +60,20 @@ export function useInterpolatedSky(rawData) {
     }
   }, [])
 
+  // When new API data arrives — animate from current visual position
   useEffect(() => {
     if (!rawData) return
-
-    // First load — instant, no animation
     if (!displayedRef.current) {
       displayedRef.current = rawData
       targetRef.current    = rawData
       setDisplayed(rawData)
       return
     }
-
-    // New target arrived — animate FROM current displayed position
-    // This prevents backward jumps: we always start from where we ARE visually
     cancelAnimationFrame(rafRef.current)
-    fromRef.current   = displayedRef.current  // snapshot current visual state
+    fromRef.current   = displayedRef.current
     targetRef.current = rawData
     startRef.current  = performance.now()
-
     rafRef.current = requestAnimationFrame(animate)
-
     return () => cancelAnimationFrame(rafRef.current)
   }, [rawData, animate])
 

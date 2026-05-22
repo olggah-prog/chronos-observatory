@@ -85,8 +85,9 @@ export default function App() {
   const [seeking, setSeeking]       = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
+  const [seekDt, setSeekDt]           = useState('')
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
-  const data = useInterpolatedSky(rawData)
+  const data = useInterpolatedSky(rawData, seekDt)
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
   useEffect(() => {
@@ -173,7 +174,7 @@ export default function App() {
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
 
-            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking}/>
+            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking} onSeekDt={setSeekDt}/>
 
             <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
             <TelemetryPanel planets={data.planets}/>
