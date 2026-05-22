@@ -67,6 +67,7 @@ _STAR_ERRORS = []
 def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
     global _STAR_ERRORS
     _STAR_ERRORS = []
+    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
     ayanamsha_value = round(swe.get_ayanamsa(jd), 6)
     stars = []
     conjunctions = []
