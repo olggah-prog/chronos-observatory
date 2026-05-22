@@ -5,9 +5,9 @@ const PLANET_SYMBOL = {
 }
 
 export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', ayanamsha_value = null }) {
-  if (!conjunctions || conjunctions.length === 0) return null
+  const empty = !conjunctions || conjunctions.length === 0
   return (
-    <div style={{ border: '1px solid rgba(14,165,233,0.12)', background: 'rgba(2,8,18,0.70)', borderRadius: '6px', padding: '16px 20px' }}>
+    <div style={{ border: '1px solid rgba(14,165,233,0.12)', background: 'rgba(2,8,18,0.70)', borderRadius: '6px', padding: '16px 20px', minHeight: '160px' }}>
       <div className="flex items-center justify-between mb-3">
         <span className="text-[9px] tracking-[0.4em] text-slate-600 uppercase">Fixed Star Contacts</span>
         {ayanamsha && ayanamsha_value != null && (
@@ -21,7 +21,10 @@ export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', a
           <span key={i} className="text-[8px] tracking-[0.25em] text-slate-700 uppercase">{h}</span>
         ))}
       </div>
-      <div className="space-y-0.5">
+      {empty ? (
+        <div style={{ color: "rgba(100,120,150,0.35)", fontSize: "9px", letterSpacing: "0.2em", fontFamily: "monospace", paddingTop: "8px" }}>NO ACTIVE CONTACTS</div>
+      ) : (
+      <div className="space-y-0.5" style={{ maxHeight: "200px", overflowY: "auto" }}>
         {conjunctions.map((c, i) => {
           const applying = c.applying === true
           return (
@@ -41,6 +44,7 @@ export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', a
           )
         })}
       </div>
+      )}
     </div>
   )
 }

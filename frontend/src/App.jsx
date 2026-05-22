@@ -173,9 +173,9 @@ export default function App() {
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
 
-            <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
-
             <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking}/>
+
+            <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
             <TelemetryPanel planets={data.planets}/>
           </>
         )}
