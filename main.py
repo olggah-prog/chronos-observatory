@@ -79,3 +79,17 @@ if os.path.exists(dist):
     def serve_frontend(full_path: str):
         index = os.path.join(dist, 'index.html')
         return FileResponse(index)
+
+@app.get("/debug-stars")
+def debug_stars():
+    import swisseph as swe, os
+    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
+    jd = swe.julday(2026, 5, 22, 9.0)
+    results = {}
+    for name in ["Aldebaran","Regulus","Antares","Fomalhaut","Spica","Alcyone","Sirius","Vega","Arcturus","Achernar","Pollux","Deneb"]:
+        try:
+            ret, xx, serr = swe.fixstar2(name, jd, swe.FLG_SWIEPH | swe.FLG_SPEED)
+            results[name] = {"ok": True, "lon": round(float(ret[0]), 4)}
+        except Exception as e:
+            results[name] = {"ok": False, "error": str(e)}
+    return results
