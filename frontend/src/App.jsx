@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSkyData } from './hooks/useSkyData'
+import { useInterpolatedSky } from './hooks/useInterpolatedSky'
 import ZodiacWheel       from './components/ZodiacWheel'
 import VisibleSkyMap     from './components/VisibleSkyMap'
 import PlanetCard        from './components/PlanetCard'
@@ -84,7 +85,8 @@ export default function App() {
   const [seeking, setSeeking]       = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
-  const { data, loading, error, refetch } = useSkyData(selectedDt)
+  const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
+  const data = useInterpolatedSky(rawData)
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
   useEffect(() => {
