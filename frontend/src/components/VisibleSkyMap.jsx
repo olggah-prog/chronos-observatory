@@ -313,7 +313,9 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               }
 
               return (
-                <g key={p.name} opacity={p.visible ? 1 : 0.09}>
+                <g key={p.name} opacity={p.visible ? 1 : 0.09}
+                  transform={`translate(${p.x},${p.y})`}
+                  style={{ transition: 'transform 0.9s cubic-bezier(0.25,0.1,0.25,1)' }}>
                   <title>
                     {`${p.name}  ·  alt ${p.altitude.toFixed(1)}°  ·  az ${p.azimuth.toFixed(1)}° (S-ref)`}
                     {p.illumination_pct != null ? `  ·  ${p.illumination_pct.toFixed(0)}% lit` : ''}
@@ -322,17 +324,17 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
                   </title>
 
                   {p.name === 'Moon' ? (
-                    <MoonPhase cx={p.x} cy={p.y} r={p.r}
+                    <MoonPhase cx={0} cy={0} r={p.r}
                       illumination_pct={p.illumination_pct ?? 50}
                       waxing={p.waxing ?? true} />
                   ) : (
-                    <circle cx={p.x} cy={p.y} r={p.r}
+                    <circle cx={0} cy={0} r={p.r}
                       fill={p.meta.color}
                       filter={p.visible ? 'url(#vsPGlow)' : undefined} />
                   )}
 
                   {p.name !== 'Moon' && (
-                    <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle"
+                    <text x={0} y={0} textAnchor="middle" dominantBaseline="middle"
                       fontSize={p.r >= 8 ? '8' : '6'} fill="rgba(4,10,18,0.90)" fontWeight="bold"
                       style={{ fontFamily: 'serif', userSelect: 'none', pointerEvents: 'none' }}>
                       {p.meta.symbol}
@@ -340,7 +342,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
                   )}
 
                   {labeled && (
-                    <text x={p.x} y={p.y + p.r + 11} textAnchor="middle" fontSize="7.5"
+                    <text x={0} y={p.r + 11} textAnchor="middle" fontSize="7.5"
                       fill={p.meta.color} opacity={p.visible ? 0.70 : 0.22}
                       style={{ fontFamily: 'monospace', userSelect: 'none' }}>
                       {p.name === 'Moon' && p.illumination_pct != null
