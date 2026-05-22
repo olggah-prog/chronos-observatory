@@ -50,58 +50,10 @@ def sky(
 
     return get_sky_snapshot(parsed_dt, observer_lat=lat, observer_lon=lon)
 
-@app.get("/debug/raw")
-def debug_raw():
-    import swisseph as swe, os
-    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
-    swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY)
-    flag = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
-    results = {}
-    for name in ["Aldebaran", "Regulus", "Spica"]:
-        try:
-            a, b, c = swe.fixstar2(name, 2451545.0, flag)
-            results[name] = {
-                "a_type": str(type(a)),
-                "a_val": str(a)[:80],
-                "b_type": str(type(b)),
-                "b_val": str(b)[:80],
-            }
-        except Exception as e:
-            results[name] = {"error": str(e)}
-    return results
-
-
 # Serve frontend
 dist = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
 if os.path.exists(dist):
     app.mount('/assets', StaticFiles(directory=os.path.join(dist, 'assets')), name='assets')
-
-@app.get("/debug-stars")
-def debug_stars():
-    import swisseph as swe, os
-    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
-    jd = swe.julday(2026, 5, 22, 9.0)
-    results = {}
-    for name in ["Aldebaran","Regulus","Antares","Fomalhaut","Spica","Alcyone","Sirius","Vega","Arcturus","Achernar","Pollux","Deneb"]:
-        try:
-            ret, xx, serr = swe.fixstar2(name, jd, swe.FLG_SWIEPH | swe.FLG_SPEED)
-            results[name] = {"ok": True, "lon": round(float(ret[0]), 4)}
-        except Exception as e:
-            results[name] = {"ok": False, "error": str(e)}
-    return results
-
-
-@app.get("/debug-stars2")
-def debug_stars2():
-    import swisseph as swe, sky_engine
-    jd = swe.julday(2026, 5, 22, 9.0)
-    result = sky_engine._get_fixed_stars(jd, [])
-    return {
-        "stars_count": len(result["stars"]),
-        "stars": [s["name"] for s in result["stars"]],
-        "errors": sky_engine._STAR_ERRORS,
-    }
-
 
     @app.get('/{full_path:path}')
     def serve_frontend(full_path: str):

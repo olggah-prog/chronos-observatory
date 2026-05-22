@@ -62,11 +62,7 @@ def _is_applying(planet_speed: float, planet_lon: float, star_lon: float) -> boo
     return diff > 180
 
 
-_STAR_ERRORS = []
-
 def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
-    global _STAR_ERRORS
-    _STAR_ERRORS = []
     swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
     ayanamsha_value = round(swe.get_ayanamsa(jd), 6)
     stars = []
@@ -103,8 +99,7 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
                         "planet_lon": round(p_lon, 4),
                     })
         except Exception as e:
-            import traceback
-            _STAR_ERRORS.append({"star": name, "error": str(e), "type": type(e).__name__, "tb": traceback.format_exc()})
+            print("[fixed_stars] " + name + ": " + str(e))
             continue
 
     return {
