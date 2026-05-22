@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 
 const PAST_DAYS        = 365
 const FUTURE_DAYS      = 30
-const API_DEBOUNCE_MS  = 400
-const PLAY_INTERVAL_MS = 320
+const API_DEBOUNCE_MS  = 350
+const PLAY_INTERVAL_MS = 400
 
 function offsetDate(base, days) {
   const d = new Date(base)
@@ -24,9 +24,7 @@ function labelFromOffset(offset, today) {
   }) + ' UTC'
 }
 
-// onChange — debounced API call (heavy)
-// onSeekDt — live dt string for interpolation (instant, no API)
-export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
+export default function TimelineSlider({ value, onChange, onSeek }) {
   const [offset, setOffset]   = useState(0)
   const [playing, setPlaying] = useState(false)
 
@@ -34,15 +32,11 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
   const playRef     = useRef(null)
   const debounceRef = useRef(null)
 
-  function dtFromDays(days) {
-    if (days === 0) return ''
-    return toIso(offsetDate(todayRef.current, days))
-  }
-
-  function commitApi(days) {
+  function fireChange(days) {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
-      onChange(dtFromDays(days))
+      if (days === 0) onChange('')
+      else onChange(toIso(offsetDate(todayRef.current, days)))
     }, API_DEBOUNCE_MS)
   }
 
@@ -50,10 +44,7 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
     const days = parseInt(e.target.value, 10)
     setOffset(days)
     onSeek?.(true)
-    // Live: instantly notify interpolation layer
-    onSeekDt?.(dtFromDays(days))
-    // Debounced: trigger actual API fetch
-    commitApi(days)
+    fireChange(days)
   }
 
   function handleNow() {
@@ -61,7 +52,6 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
     clearTimeout(debounceRef.current)
     setPlaying(false)
     setOffset(0)
-    onSeekDt?.('')
     onChange('')
   }
 
@@ -75,9 +65,8 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
     playRef.current = setInterval(() => {
       setOffset(prev => {
         const next = prev >= FUTURE_DAYS ? -PAST_DAYS : prev + 1
-        const dt   = dtFromDays(next)
-        onSeekDt?.(dt)
-        commitApi(next)
+        if (next === 0) onChange('')
+        else onChange(toIso(offsetDate(todayRef.current, next)))
         return next
       })
     }, PLAY_INTERVAL_MS)
@@ -95,9 +84,7 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
       <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-        <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">
-          Temporal Navigation
-        </span>
+        <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">Temporal Navigation</span>
         <span className="text-[13px] tracking-widest font-bold tabular-nums" style={{
           fontFamily: 'Orbitron, monospace',
           color:      offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
@@ -121,13 +108,11 @@ export default function TimelineSlider({ value, onChange, onSeek, onSeekDt }) {
           </button>
         </div>
       </div>
-
       <div>
         <input type="range" min={-PAST_DAYS} max={FUTURE_DAYS}
           value={offset} onInput={handleSlider} onChange={handleSlider}
           className="w-full"/>
       </div>
-
       <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
         <span>−{PAST_DAYS}d</span>
         <span>−{Math.round(PAST_DAYS / 2)}d</span>
