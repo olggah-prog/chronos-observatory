@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 
-const ACTIVE = ['Planets', 'Fixed Stars']
-
 const ANCIENT = ['Egyptian', 'Maya', 'Chinese', 'Jyotisha', 'Babylonian', 'Kabbalah', 'Arabic Cycles', 'Celtic']
-
 const EXPERIMENTAL = ['Synchro', 'Resonance', 'Parans']
-
 
 function ActiveRow({ label, on, onToggle }) {
   return (
@@ -30,6 +26,36 @@ function ActiveRow({ label, on, onToggle }) {
   )
 }
 
+function Divider({ label }) {
+  return (
+    <div style={{
+      fontFamily: 'monospace',
+      fontSize: '6.5px',
+      letterSpacing: '0.18em',
+      color: 'rgba(130,148,172,0.28)',
+      fontStyle: 'italic',
+      marginBottom: '8px',
+    }}>— {label} —</div>
+  )
+}
+
+function Row({ name }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: '8px',
+      marginBottom: '5px',
+      fontFamily: 'monospace',
+      fontSize: '8.5px',
+      letterSpacing: '0.10em',
+      color: 'rgba(140,158,182,0.30)',
+      cursor: 'default',
+    }}>
+      <span style={{ fontSize: '7px', opacity: 0.4 }}>○</span>
+      {name}
+    </div>
+  )
+}
+
 export default function SystemsDropdown({ showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -49,7 +75,6 @@ export default function SystemsDropdown({ showPlanets = true, showStars = true, 
         style={{
           background: 'none',
           border: 'none',
-          padding: '0',
           cursor: 'pointer',
           fontFamily: 'monospace',
           fontSize: '9.5px',
@@ -87,61 +112,22 @@ export default function SystemsDropdown({ showPlanets = true, showStars = true, 
           backdropFilter: 'blur(12px)',
           boxShadow: '0 8px 40px rgba(0,0,0,0.55)',
         }}>
-          {/* Active */}
           <div style={{ marginBottom: '14px' }}>
             <ActiveRow label="Planets"     on={showPlanets} onToggle={onTogglePlanets}/>
             <ActiveRow label="Fixed Stars" on={showStars}   onToggle={onToggleStars}/>
           </div>
-            ))}
-          </div>
 
           <Divider label="Ancient Systems" />
-
           <div style={{ marginBottom: '14px' }}>
-            {ANCIENT.map(name => (
-              <Row key={name} name={name} />
-            ))}
+            {ANCIENT.map(name => <Row key={name} name={name}/>)}
           </div>
 
           <Divider label="Experimental" />
-
           <div>
-            {EXPERIMENTAL.map(name => (
-              <Row key={name} name={name} />
-            ))}
+            {EXPERIMENTAL.map(name => <Row key={name} name={name}/>)}
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-function Divider({ label }) {
-  return (
-    <div style={{
-      fontFamily: 'monospace',
-      fontSize: '6.5px',
-      letterSpacing: '0.18em',
-      color: 'rgba(130,148,172,0.28)',
-      fontStyle: 'italic',
-      marginBottom: '8px',
-    }}>— {label} —</div>
-  )
-}
-
-function Row({ name }) {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: '8px',
-      marginBottom: '5px',
-      fontFamily: 'monospace',
-      fontSize: '8.5px',
-      letterSpacing: '0.10em',
-      color: 'rgba(140,158,182,0.30)',
-      cursor: 'default',
-    }}>
-      <span style={{ fontSize: '7px', opacity: 0.4 }}>○</span>
-      {name}
     </div>
   )
 }
