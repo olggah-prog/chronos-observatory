@@ -144,14 +144,7 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
 
       {/* Track + thumb */}
       <div className="relative">
-        <div
-          className="absolute top-1/2 left-0 h-[3px] rounded -translate-y-1/2 pointer-events-none"
-          style={{
-            width: `${pct}%`,
-            background: 'linear-gradient(to right, rgba(14,100,160,0.4), rgba(180,210,240,0.7))',
-            boxShadow: '0 0 4px rgba(180,215,245,0.18)',
-          }}
-        />
+
         <input
           type="range"
           min={-PAST_DAYS}
