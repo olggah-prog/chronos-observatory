@@ -7,12 +7,13 @@ const R = {
   zodiacOuter: 263,
   zodiacInner: 213,
   tickOuter:   211,
-  tickInner:   205,
-  tickMajor:   194,
+  tickInner:   207,
+  tickMid:     203,
+  tickMajor:   196,
+  starRing:    205,
   planet:      175,
   innerBg:     210,
-  center:       28,
-  star:        205,
+  center:       22,
 }
 
 const PLANET_SIZE = {
@@ -41,6 +42,29 @@ function rimAnchor(pt) {
   return 'middle'
 }
 
+function AxisArrow({ lon, label, endR, lblR, lyOff = 0 }) {
+  const tip  = lonXY(lon, endR)
+  const base = lonXY(lon, endR + 9)
+  const dx = tip.x - base.x, dy = tip.y - base.y
+  const len = Math.sqrt(dx*dx + dy*dy) || 1
+  const nx = dx/len, ny = dy/len
+  const px = -ny, py = nx
+  const a1x = (base.x + px*3).toFixed(2), a1y = (base.y + py*3).toFixed(2)
+  const a2x = (base.x - px*3).toFixed(2), a2y = (base.y - py*3).toFixed(2)
+  const lp  = lonXY(lon, lblR)
+  return (
+    <g>
+      <polygon points={`${tip.x},${tip.y} ${a1x},${a1y} ${a2x},${a2y}`}
+        fill="rgba(210,218,228,0.65)"/>
+      <text x={lp.x} y={lp.y + lyOff} textAnchor={rimAnchor(lp)} dominantBaseline="middle"
+        fontSize="10.5" fill="rgba(200,210,225,0.72)"
+        style={{ fontFamily: 'Orbitron, monospace', letterSpacing: '0.08em' }}>
+        {label}
+      </text>
+    </g>
+  )
+}
+
 export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [] }) {
   const segments = useMemo(() =>
     ZODIAC_META.map((sign, i) => ({
@@ -51,9 +75,15 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
 
   const ticks = useMemo(() => {
     const out = []
-    for (let deg = 0; deg < 360; deg += 10) {
+    for (let deg = 0; deg < 360; deg += 5) {
       const major = deg % 30 === 0
-      out.push({ deg, p1: lonXY(deg, R.tickOuter), p2: lonXY(deg, major ? R.tickMajor : R.tickInner), major })
+      const mid   = deg % 10 === 0 && !major
+      out.push({
+        deg,
+        p1: lonXY(deg, R.tickOuter),
+        p2: lonXY(deg, major ? R.tickMajor : mid ? R.tickMid : R.tickInner),
+        major, mid,
+      })
     }
     return out
   }, [])
@@ -69,41 +99,56 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
   }, [planets])
 
   const starPositions = useMemo(() =>
-    stars.map(s => ({ ...s, pos: lonXY(s.lon, R.star) })), [stars])
+    stars.map(s => ({ ...s, pos: lonXY(s.lon, R.starRing) })), [stars])
 
   const conjStarNames = useMemo(() => new Set((conjunctions ?? []).map(c => c.star)), [conjunctions])
 
-  const axisPairs = useMemo(() => {
+  const axisPoints = useMemo(() => {
     if (!angles) return []
-    const endR = R.zodiacInner - 4, lblR = R.outerRim + 20
-    const defs = [
-      { key: 'asc-dsc', dash: undefined, sides: [{ lon: angles.asc, label: 'ASC' }, { lon: angles.dsc, label: 'DSC' }] },
-      { key: 'mc-ic',   dash: '4 5',     sides: [{ lon: angles.mc,  label: 'MC'  }, { lon: angles.ic,  label: 'IC'  }] },
-    ]
-    const pts = defs.flatMap(d => d.sides).map(s => ({ ...s, p: lonXY(s.lon, endR), lp: lonXY(s.lon, lblR), lyOff: 0 }))
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i + 1; j < pts.length; j++) {
-        const dx = pts[i].lp.x - pts[j].lp.x, dy = pts[i].lp.y - pts[j].lp.y
+    const endR = R.zodiacInner - 3
+    const lblR = R.outerRim + 22
+    const items = [
+      { lon: angles.asc, label: 'ASC' },
+      { lon: angles.dsc, label: 'DSC' },
+      { lon: angles.mc,  label: 'MC'  },
+      { lon: angles.ic,  label: 'IC'  },
+    ].map(a => ({ ...a, endR, lblR, lyOff: 0 }))
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const pi = lonXY(items[i].lon, lblR), pj = lonXY(items[j].lon, lblR)
+        const dx = pi.x - pj.x, dy = pi.y - pj.y
         if (Math.sqrt(dx*dx + dy*dy) < 28) {
-          const sign = pts[i].lp.y <= CY ? -1 : 1
-          pts[i].lyOff = sign * 8; pts[j].lyOff = -sign * 8
+          const sign = pi.y <= CY ? -1 : 1
+          items[i].lyOff =  sign * 8
+          items[j].lyOff = -sign * 8
         }
       }
     }
-    return defs.map((d, di) => ({ ...d, ends: d.sides.map((_, si) => pts[di * 2 + si]) }))
+    return items
+  }, [angles])
+
+  const axisPairs = useMemo(() => {
+    if (!angles) return []
+    const endR = R.zodiacInner - 3
+    return [
+      { key: 'asc-dsc', dash: undefined,
+        p1: lonXY(angles.asc, endR), p2: lonXY(angles.dsc, endR) },
+      { key: 'mc-ic',   dash: '4 6',
+        p1: lonXY(angles.mc,  endR), p2: lonXY(angles.ic,  endR) },
+    ]
   }, [angles])
 
   return (
     <div className="flex items-center justify-center w-full">
       <svg viewBox="-36 -36 672 672" className="w-full max-w-[540px]"
-        style={{ filter: 'drop-shadow(0 0 28px rgba(80,100,140,0.14))' }}>
+        style={{ filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
         <defs>
           <filter id="pGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="0.6" result="blur"/>
+            <feGaussianBlur stdDeviation="0.5" result="blur"/>
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
-          <filter id="starGlow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="1.8" result="blur"/>
+          <filter id="starGlow" x="-120%" y="-120%" width="340%" height="340%">
+            <feGaussianBlur stdDeviation="2.2" result="blur"/>
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
           <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
@@ -114,100 +159,103 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stopColor="white" stopOpacity="0"/>
             <stop offset="74%"  stopColor="white" stopOpacity="0"/>
-            <stop offset="78%"  stopColor="white" stopOpacity="0.045"/>
-            <stop offset="86%"  stopColor="white" stopOpacity="0.06"/>
-            <stop offset="94%"  stopColor="white" stopOpacity="0.03"/>
+            <stop offset="78%"  stopColor="white" stopOpacity="0.04"/>
+            <stop offset="86%"  stopColor="white" stopOpacity="0.055"/>
+            <stop offset="94%"  stopColor="white" stopOpacity="0.025"/>
             <stop offset="100%" stopColor="white" stopOpacity="0"/>
           </radialGradient>
         </defs>
 
         <circle cx={CX} cy={CY} r={R.zodiacOuter + 1} fill="url(#ringGrad)"/>
-        <circle cx={CX} cy={CY} r={R.outerRim} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.7"/>
+        <circle cx={CX} cy={CY} r={R.outerRim} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.6"/>
 
         {segments.map((seg, i) => (
           <g key={i}>
-            <path d={seg.path} fill="rgba(255,255,255,0.018)" stroke="rgba(255,255,255,0.10)" strokeWidth="0.45"/>
+            <path d={seg.path} fill="rgba(255,255,255,0.016)" stroke="rgba(255,255,255,0.09)" strokeWidth="0.4"/>
             <text x={seg.labelPos.x} y={seg.labelPos.y} textAnchor="middle" dominantBaseline="middle"
-              fontSize="21" fill="rgba(210,215,225,0.68)" style={{ fontFamily: 'serif', userSelect: 'none' }}>
+              fontSize="21" fill="rgba(200,208,220,0.60)" style={{ fontFamily: 'serif', userSelect: 'none' }}>
               {seg.symbol}
             </text>
           </g>
         ))}
 
-        {ticks.map(({ deg, p1, p2, major }) => (
+        {ticks.map(({ deg, p1, p2, major, mid }) => (
           <line key={deg} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
-            stroke={major ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.08)'}
-            strokeWidth={major ? 1.0 : 0.45}/>
+            stroke={major ? 'rgba(255,255,255,0.20)' : mid ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}
+            strokeWidth={major ? 0.9 : mid ? 0.5 : 0.35}/>
         ))}
 
         <circle cx={CX} cy={CY} r={R.innerBg} fill="url(#bgGrad)"/>
-        <circle cx={CX} cy={CY} r={R.innerBg} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+        <circle cx={CX} cy={CY} r={R.innerBg} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="0.45"/>
 
-        {[148, 168, 188].map(r => (
+        {[152, 172].map(r => (
           <circle key={r} cx={CX} cy={CY} r={r} fill="none"
-            stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" strokeDasharray="2 10"/>
+            stroke="rgba(255,255,255,0.04)" strokeWidth="0.4" strokeDasharray="1.5 10"/>
         ))}
 
         {[0, 90, 180, 270].map(deg => {
-          const a = lonXY(deg, 34), b = lonXY(deg, R.innerBg - 2)
+          const a = lonXY(deg, 32), b = lonXY(deg, R.innerBg - 2)
           return <line key={deg} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-            stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" strokeDasharray="2 9"/>
+            stroke="rgba(255,255,255,0.04)" strokeWidth="0.4" strokeDasharray="1.5 9"/>
         })}
+
+        <circle cx={CX} cy={CY} r={R.starRing} fill="none"
+          stroke="rgba(255,245,180,0.06)" strokeWidth="0.5"/>
 
         {axisPairs.map(pair => (
           <line key={pair.key}
-            x1={pair.ends[0].p.x} y1={pair.ends[0].p.y}
-            x2={pair.ends[1].p.x} y2={pair.ends[1].p.y}
-            stroke="rgba(220,225,232,0.42)" strokeWidth="0.8" strokeDasharray={pair.dash}/>
+            x1={pair.p1.x} y1={pair.p1.y} x2={pair.p2.x} y2={pair.p2.y}
+            stroke="rgba(210,220,232,0.35)" strokeWidth="0.7" strokeDasharray={pair.dash}/>
         ))}
 
-        {/* Fixed stars */}
         <g filter="url(#starGlow)">
           {starPositions.map(s => {
             const isActive = conjStarNames.has(s.name)
+            const labelPt  = lonXY(s.lon, R.starRing + 12)
             return (
               <g key={s.name}>
-                <title>{s.name} · {s.lon.toFixed(2)}°</title>
-                <circle cx={s.pos.x} cy={s.pos.y} r={isActive ? 5.5 : 4.0}
-                  fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
+                <title>{s.name} {s.lon.toFixed(2)}</title>
+                <circle cx={s.pos.x} cy={s.pos.y} r={isActive ? 5.5 : 3.8}
+                  fill="none" stroke="rgba(255,252,220,0.07)" strokeWidth="0.6"/>
                 {isActive && (
-                  <circle cx={s.pos.x} cy={s.pos.y} r="6" fill="none"
-                    stroke="rgba(255,240,160,0.45)" strokeWidth="0.8">
-                    <animate attributeName="opacity" values="0.45;0.10;0.45" dur="3.5s" repeatCount="indefinite"/>
+                  <circle cx={s.pos.x} cy={s.pos.y} r="7" fill="none"
+                    stroke="rgba(255,240,140,0.30)" strokeWidth="0.7">
+                    <animate attributeName="r" values="7;10;7" dur="4s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.30;0;0.30" dur="4s" repeatCount="indefinite"/>
                   </circle>
                 )}
                 <circle cx={s.pos.x} cy={s.pos.y}
-                  r={isActive ? 3.5 : 2.5}
-                  fill={isActive ? 'rgba(255,248,200,1.0)' : 'rgba(255,245,200,0.75)'}/>
-                {isActive && (
-                  <text x={s.pos.x + 5} y={s.pos.y - 4}
-                    fontSize="6" fill="rgba(255,240,160,0.85)"
-                    fontFamily="monospace" letterSpacing="0.5">{s.name}</text>
-                )}
+                  r={isActive ? 3.0 : 2.0}
+                  fill={isActive ? 'rgba(255,250,210,0.95)' : 'rgba(255,248,200,0.55)'}/>
+                <text x={labelPt.x} y={labelPt.y}
+                  textAnchor={rimAnchor(labelPt)} dominantBaseline="middle"
+                  fontSize="5.8"
+                  fill={isActive ? 'rgba(255,245,180,0.80)' : 'rgba(255,248,210,0.28)'}
+                  style={{ fontFamily: 'monospace', letterSpacing: '0.4px' }}>
+                  {s.name}
+                </text>
               </g>
             )
           })}
         </g>
 
-        {/* Conjunction lines */}
         {(conjunctions ?? []).map((c, i) => {
           const planet = planetPositions.find(p => p.name === c.planet)
           const star   = starPositions.find(s => s.name === c.star)
           if (!planet || !star || c.orb > 2.0) return null
-          const opacity = Math.max(0.05, 0.22 - c.orb * 0.08)
+          const opacity = Math.max(0.04, 0.18 - c.orb * 0.07)
           return (
             <line key={`cl-${i}`}
               x1={planet.pos.x} y1={planet.pos.y} x2={star.pos.x} y2={star.pos.y}
-              stroke={`rgba(255,240,160,${opacity.toFixed(2)})`}
-              strokeWidth="0.5" strokeDasharray="2 6"/>
+              stroke={`rgba(255,240,150,${opacity.toFixed(2)})`}
+              strokeWidth="0.45" strokeDasharray="1.5 7"/>
           )
         })}
 
-        {/* Retrograde */}
         {planetPositions.filter(p => p.retrograde).map(p => (
           <circle key={`rx-${p.name}`} cx={p.pos.x} cy={p.pos.y} r={10}
-            fill="none" stroke="rgba(200,205,215,0.40)" strokeWidth="0.65" strokeDasharray="2 3.5">
-            <animate attributeName="opacity" values="0.40;0.06;0.40" dur="4s" repeatCount="indefinite"/>
+            fill="none" stroke="rgba(190,198,212,0.32)" strokeWidth="0.55" strokeDasharray="2 3.5">
+            <animate attributeName="opacity" values="0.32;0.05;0.32" dur="4.5s" repeatCount="indefinite"/>
           </circle>
         ))}
 
@@ -216,10 +264,10 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             const sz = PLANET_SIZE[p.name] ?? 18
             return (
               <g key={p.name}>
-                <title>{p.name} · {p.zodiac_sign} {p.longitude.toFixed(2)}°{p.retrograde ? ' ℞' : ''}</title>
+                <title>{p.name} {p.zodiac_sign} {p.longitude.toFixed(2)}{p.retrograde ? ' R' : ''}</title>
                 <circle cx={p.pos.x} cy={p.pos.y} r="13" fill="transparent" style={{ cursor: 'default' }}/>
                 <text x={p.pos.x} y={p.pos.y} textAnchor="middle" dominantBaseline="middle"
-                  fontSize={sz} fill="rgba(225,228,235,0.90)"
+                  fontSize={sz} fill="rgba(220,225,235,0.88)"
                   style={{ fontFamily: 'serif', userSelect: 'none', pointerEvents: 'none' }}>
                   {p.meta.symbol}
                 </text>
@@ -228,24 +276,16 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           })}
         </g>
 
-        {axisPairs.map(pair =>
-          pair.ends.map(({ p, lp, label, lyOff }) => (
-            <g key={label}>
-              <circle cx={p.x} cy={p.y} r="2" fill="rgba(220,225,232,0.70)"/>
-              <text x={lp.x} y={lp.y + lyOff} textAnchor={rimAnchor(lp)} dominantBaseline="middle"
-                fontSize="11" fill="rgba(210,218,228,0.80)"
-                style={{ fontFamily: 'Orbitron, monospace', letterSpacing: '0.06em' }}>
-                {label}
-              </text>
-            </g>
-          ))
-        )}
+        {axisPoints.map(a => (
+          <AxisArrow key={a.label} lon={a.lon} label={a.label}
+            endR={a.endR} lblR={a.lblR} lyOff={a.lyOff}/>
+        ))}
 
-        <circle cx={CX} cy={CY} r={R.center} fill="#030911" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
-        <circle cx={CX} cy={CY} r="11" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.4"/>
-        <line x1={CX-20} y1={CY} x2={CX+20} y2={CY} stroke="rgba(255,255,255,0.12)" strokeWidth="0.4"/>
-        <line x1={CX} y1={CY-20} x2={CX} y2={CY+20} stroke="rgba(255,255,255,0.12)" strokeWidth="0.4"/>
-        <circle cx={CX} cy={CY} r="2.2" fill="rgba(210,195,150,0.80)"/>
+        <circle cx={CX} cy={CY} r={R.center} fill="#030911" stroke="rgba(255,255,255,0.08)" strokeWidth="0.45"/>
+        <circle cx={CX} cy={CY} r="9" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.35"/>
+        <line x1={CX-18} y1={CY} x2={CX+18} y2={CY} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
+        <line x1={CX} y1={CY-18} x2={CX} y2={CY+18} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
+        <circle cx={CX} cy={CY} r="2.0" fill="rgba(205,190,145,0.85)"/>
       </svg>
     </div>
   )
