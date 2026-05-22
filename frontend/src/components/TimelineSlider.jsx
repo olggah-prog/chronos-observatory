@@ -16,7 +16,7 @@ function toIso(date) {
 }
 
 function labelFromOffset(offset, today) {
-  if (offset === 0) return 'NOW  —  LIVE FEED'
+  if (offset === 0) return 'NOW — LIVE FEED'
   const d = offsetDate(today, offset)
   return d.toLocaleDateString('en-US', {
     year: 'numeric', month: 'short', day: 'numeric',
@@ -86,10 +86,10 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
       border: '1px solid rgba(180,210,240,0.10)',
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
-      <div className="mb-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">Temporal Navigation</span>
-          <div className="flex gap-2">
+      {/* Row 1: label + buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">Temporal Navigation</span>
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
           <button onClick={togglePlay}
             className="text-[9px] px-3 py-1.5 rounded tracking-[0.2em] border transition-colors"
             style={playing
@@ -104,24 +104,28 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
             ◉ NOW
           </button>
         </div>
-        <div className="text-[13px] tracking-widest font-bold tabular-nums mt-2" style={{
-          fontFamily: 'Orbitron, monospace',
-          color: offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
-          textShadow: offset === 0 ? '0 0 10px rgba(120,200,160,0.25)' : '0 0 10px rgba(140,190,230,0.22)',
-        }}>
-          {labelFromOffset(offset, todayRef.current)}
-        </div>
       </div>
-    </div>
-    <div>
+      {/* Row 2: date — full width, never moves buttons */}
+      <div style={{
+        fontFamily: 'Orbitron, monospace',
+        fontSize: '13px',
+        letterSpacing: '0.05em',
+        fontWeight: 'bold',
+        color: offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
+        marginBottom: '12px',
+        minHeight: '20px',
+      }}>
+        {labelFromOffset(offset, todayRef.current)}
+      </div>
+      {/* Slider */}
       <input type="range" min={-PAST_DAYS} max={FUTURE_DAYS}
-          value={offset} onInput={handleSlider} onChange={handleSlider}
-          className="w-full"/>
-      </div>
+        value={offset} onInput={handleSlider} onChange={handleSlider}
+        className="w-full"/>
+      {/* Scale */}
       <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
         <span>−{PAST_DAYS}d</span>
         <span>−{Math.round(PAST_DAYS / 2)}d</span>
-        <span style={{ color: offset === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }} className="transition-colors">TODAY</span>
+        <span style={{ color: offset === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }}>TODAY</span>
         <span>+{FUTURE_DAYS}d</span>
       </div>
     </div>
