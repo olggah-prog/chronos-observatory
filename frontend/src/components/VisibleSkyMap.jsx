@@ -56,7 +56,7 @@ function MoonPhase({ cx, cy, r, illumination_pct, waxing }) {
 // ─── Angle marker (ASC / DSC / MC / IC) ──────────────────────────────────────
 // Appears as a small diamond + thin vertical tick + label at its sky position.
 function AngleMarker({ az, alt, label }) {
-  if (alt < -2) return null   // well below horizon — skip
+  if (alt < -8) return null   // well below horizon — skip
   const caz = toCompass(az)
   const x   = azToX(caz)
   const y   = altToY(Math.max(alt, 0))   // clamp to horizon if slightly below
@@ -87,7 +87,6 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
     const moonWaxing = ((moonLon - sunLon + 360) % 360) < 180
 
     return planets
-      .filter(p => p.above_horizon)
       .map(p => {
         const caz    = toCompass(p.azimuth)
         const waxing = p.name === 'Moon' ? moonWaxing : undefined
@@ -315,7 +314,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               }
 
               return (
-                <g key={p.name} opacity={p.visible ? 1 : 0.09}
+                <g key={p.name} opacity={!p.above_horizon ? 0 : p.visible ? 1 : 0.09}
                   transform={`translate(${p.x},${p.y})`}
                   style={{ transition: 'transform 1.4s cubic-bezier(0.25,0.1,0.25,1)' }}>
                   <title>
