@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useInterpolatedBodies } from '../hooks/useInterpolatedBodies'
 import { PLANET_META } from '../utils/planets'
 
 const VW        = 900
@@ -80,7 +81,7 @@ function AngleMarker({ az, alt, label }) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [] }) {
-  const bodies = useMemo(() => {
+  const rawBodies = useMemo(() => {
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
     const moonWaxing = ((moonLon - sunLon + 360) % 360) < 180
@@ -104,6 +105,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
       })
   }, [planets])
 
+  const bodies = useInterpolatedBodies(rawBodies)
   const visibleCount = bodies.filter(b => b.visible && !b.isNode).length
 
   // Paran rendering helpers — set of body names involved in any active paran event
