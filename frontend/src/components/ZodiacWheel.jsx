@@ -115,9 +115,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     if (!planets.length) return []
     const sorted = [...planets].sort((a, b) => a.longitude - b.longitude)
     return sorted.map((planet, i) => {
-      const nearby = sorted.filter((p, j) => j !== i && Math.abs(p.longitude - planet.longitude) < 9)
-      const rShift = nearby.length > 0 ? (i % 2 === 0 ? -18 : 16) : 0
-      return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(planet.longitude, R.planet + rShift) }
+      return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(planet.longitude, R.planet) }
     })
   }, [planets])
 
