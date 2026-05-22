@@ -227,10 +227,10 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
                 <circle cx={s.pos.x} cy={s.pos.y}
                   r={isActive ? 3.0 : 2.0}
                   fill={isActive ? 'rgba(255,250,210,0.95)' : 'rgba(255,248,200,0.55)'}/>
-                <text x={lonXY(s.lon, R.zodiacOuter + 10).x} y={lonXY(s.lon, R.zodiacOuter + 10).y}
-                  textAnchor={rimAnchor(lonXY(s.lon, R.zodiacOuter + 10))} dominantBaseline="middle"
-                  fontSize="5.5"
-                  fill={isActive ? 'rgba(255,245,180,0.75)' : 'rgba(255,248,210,0.22)'}
+                <text x={lonXY(s.lon, R.starRing - 14).x} y={lonXY(s.lon, R.starRing - 14).y}
+                  textAnchor={rimAnchor(lonXY(s.lon, R.starRing - 14))} dominantBaseline="middle"
+                  fontSize="5.8"
+                  fill={isActive ? 'rgba(255,245,180,0.82)' : 'rgba(255,248,210,0.30)'}
                   style={{ fontFamily: 'monospace', letterSpacing: '0.3px' }}>
                   {s.name}
                 </text>
