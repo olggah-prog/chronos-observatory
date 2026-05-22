@@ -90,6 +90,16 @@ def debug_stars():
             results[name] = {"ok": False, "error": str(e)}
     return results
 
+
+@app.get("/debug-stars2")
+def debug_stars2():
+    from sky_engine import _get_fixed_stars
+    import swisseph as swe
+    jd = swe.julday(2026, 5, 22, 9.0)
+    result = _get_fixed_stars(jd, [])
+    return {"stars_count": len(result["stars"]), "stars": [s["name"] for s in result["stars"]]}
+
+
     @app.get('/{full_path:path}')
     def serve_frontend(full_path: str):
         index = os.path.join(dist, 'index.html')
