@@ -86,16 +86,10 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
       border: '1px solid rgba(180,210,240,0.10)',
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
-      <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-        <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">Temporal Navigation</span>
-        <span className="text-[13px] tracking-widest font-bold tabular-nums" style={{
-          fontFamily: 'Orbitron, monospace',
-          color:      offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
-          textShadow: offset === 0 ? '0 0 10px rgba(120,200,160,0.25)' : '0 0 10px rgba(140,190,230,0.22)',
-        }}>
-          {labelFromOffset(offset, todayRef.current)}
-        </span>
-        <div className="flex gap-2">
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase">Temporal Navigation</span>
+          <div className="flex gap-2">
           <button onClick={togglePlay}
             className="text-[9px] px-3 py-1.5 rounded tracking-[0.2em] border transition-colors"
             style={playing
@@ -109,6 +103,13 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
             style={{ borderColor: 'rgba(120,190,160,0.25)', color: 'rgba(150,210,185,0.65)', background: 'transparent' }}>
             ◉ NOW
           </button>
+        </div>
+        <div className="text-[13px] tracking-widest font-bold tabular-nums mt-2" style={{
+          fontFamily: 'Orbitron, monospace',
+          color: offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
+          textShadow: offset === 0 ? '0 0 10px rgba(120,200,160,0.25)' : '0 0 10px rgba(140,190,230,0.22)',
+        }}>
+          {labelFromOffset(offset, todayRef.current)}
         </div>
       </div>
       <div>
