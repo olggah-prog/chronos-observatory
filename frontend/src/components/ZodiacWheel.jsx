@@ -96,7 +96,16 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         deg,
         p1: lonXY(deg, R.tickOuter),
         p2: lonXY(deg, major ? R.tickMajor : mid ? R.tickMid : R.tickInner),
-        major, mid,
+        major, mid, micro: false,
+      })
+    }
+    for (let deg = 0; deg < 360; deg += 1) {
+      if (deg % 5 === 0) continue
+      out.push({
+        deg,
+        p1: lonXY(deg, R.tickOuter),
+        p2: lonXY(deg, R.tickOuter - 2.2),
+        major: false, mid: false, micro: true,
       })
     }
     return out
@@ -193,10 +202,10 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           </g>
         ))}
 
-        {ticks.map(({ deg, p1, p2, major, mid }) => (
+        {ticks.map(({ deg, p1, p2, major, mid, micro }) => (
           <line key={deg} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
-            stroke={major ? 'rgba(255,255,255,0.20)' : mid ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)'}
-            strokeWidth={major ? 0.9 : mid ? 0.5 : 0.35}/>
+            stroke={major ? 'rgba(255,255,255,0.20)' : mid ? 'rgba(255,255,255,0.09)' : micro ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.05)'}
+            strokeWidth={major ? 0.9 : mid ? 0.5 : micro ? 0.25 : 0.35}/>
         ))}
 
         <circle cx={CX} cy={CY} r={R.innerBg} fill="url(#bgGrad)"/>
