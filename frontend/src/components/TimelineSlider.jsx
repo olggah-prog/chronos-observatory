@@ -167,7 +167,7 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
       <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
         <span>−{PAST_DAYS}d</span>
         <span>−{Math.round(PAST_DAYS / 2)}d</span>
-        <span style={{ color: offset === 0 ? '#4ade80' : '#334155' }} className="transition-colors">
+        <span style={{ color: offset === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }} className="transition-colors">
           TODAY
         </span>
         <span>+{FUTURE_DAYS}d</span>
