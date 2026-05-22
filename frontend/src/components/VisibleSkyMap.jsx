@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useInterpolatedBodies } from '../hooks/useInterpolatedBodies'
 import { PLANET_META } from '../utils/planets'
 
 const VW        = 900
@@ -56,7 +55,7 @@ function MoonPhase({ cx, cy, r, illumination_pct, waxing }) {
 // ─── Angle marker (ASC / DSC / MC / IC) ──────────────────────────────────────
 // Appears as a small diamond + thin vertical tick + label at its sky position.
 function AngleMarker({ az, alt, label }) {
-  if (alt < -8) return null   // well below horizon — skip
+  if (alt < -2) return null   // well below horizon — skip
   const caz = toCompass(az)
   const x   = azToX(caz)
   const y   = altToY(Math.max(alt, 0))   // clamp to horizon if slightly below
@@ -81,12 +80,13 @@ function AngleMarker({ az, alt, label }) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [] }) {
-  const rawBodies = useMemo(() => {
+  const bodies = useMemo(() => {
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
     const moonWaxing = ((moonLon - sunLon + 360) % 360) < 180
 
     return planets
+      .filter(p => p.above_horizon)
       .map(p => {
         const caz    = toCompass(p.azimuth)
         const waxing = p.name === 'Moon' ? moonWaxing : undefined
@@ -104,7 +104,6 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
       })
   }, [planets])
 
-  const bodies = useInterpolatedBodies(rawBodies)
   const visibleCount = bodies.filter(b => b.visible && !b.isNode).length
 
   // Paran rendering helpers — set of body names involved in any active paran event
@@ -314,9 +313,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               }
 
               return (
-                <g key={p.name} opacity={!p.above_horizon ? 0 : p.visible ? 1 : 0.09}
-                  transform={`translate(${p.x},${p.y})`}
-                  style={{ transition: 'transform 1.4s cubic-bezier(0.25,0.1,0.25,1)' }}>
+                <g key={p.name} opacity={p.visible ? 1 : 0.09}>
                   <title>
                     {`${p.name}  ·  alt ${p.altitude.toFixed(1)}°  ·  az ${p.azimuth.toFixed(1)}° (S-ref)`}
                     {p.illumination_pct != null ? `  ·  ${p.illumination_pct.toFixed(0)}% lit` : ''}
@@ -325,17 +322,17 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
                   </title>
 
                   {p.name === 'Moon' ? (
-                    <MoonPhase cx={0} cy={0} r={p.r}
+                    <MoonPhase cx={p.x} cy={p.y} r={p.r}
                       illumination_pct={p.illumination_pct ?? 50}
                       waxing={p.waxing ?? true} />
                   ) : (
-                    <circle cx={0} cy={0} r={p.r}
+                    <circle cx={p.x} cy={p.y} r={p.r}
                       fill={p.meta.color}
                       filter={p.visible ? 'url(#vsPGlow)' : undefined} />
                   )}
 
                   {p.name !== 'Moon' && (
-                    <text x={0} y={0} textAnchor="middle" dominantBaseline="middle"
+                    <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="middle"
                       fontSize={p.r >= 8 ? '8' : '6'} fill="rgba(4,10,18,0.90)" fontWeight="bold"
                       style={{ fontFamily: 'serif', userSelect: 'none', pointerEvents: 'none' }}>
                       {p.meta.symbol}
@@ -343,7 +340,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
                   )}
 
                   {labeled && (
-                    <text x={0} y={p.r + 11} textAnchor="middle" fontSize="7.5"
+                    <text x={p.x} y={p.y + p.r + 11} textAnchor="middle" fontSize="7.5"
                       fill={p.meta.color} opacity={p.visible ? 0.70 : 0.22}
                       style={{ fontFamily: 'monospace', userSelect: 'none' }}>
                       {p.name === 'Moon' && p.illumination_pct != null
