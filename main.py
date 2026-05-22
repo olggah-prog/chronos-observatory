@@ -75,10 +75,6 @@ def debug_raw():
 dist = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
 if os.path.exists(dist):
     app.mount('/assets', StaticFiles(directory=os.path.join(dist, 'assets')), name='assets')
-    @app.get('/{full_path:path}')
-    def serve_frontend(full_path: str):
-        index = os.path.join(dist, 'index.html')
-        return FileResponse(index)
 
 @app.get("/debug-stars")
 def debug_stars():
@@ -93,3 +89,9 @@ def debug_stars():
         except Exception as e:
             results[name] = {"ok": False, "error": str(e)}
     return results
+
+    @app.get('/{full_path:path}')
+    def serve_frontend(full_path: str):
+        index = os.path.join(dist, 'index.html')
+        return FileResponse(index)
+
