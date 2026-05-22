@@ -97,8 +97,8 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
       className="p-5 rounded"
       style={{
         background: 'rgba(5,14,26,0.7)',
-        border: '1px solid rgba(14,165,233,0.18)',
-        boxShadow: '0 0 20px rgba(14,165,233,0.05)',
+        border: '1px solid rgba(180,210,240,0.10)',
+        boxShadow: '0 0 24px rgba(100,150,200,0.06)',
       }}
     >
       {/* Header */}
@@ -112,10 +112,10 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
           style={{
             fontFamily: 'Orbitron, monospace',
             // Colour derived from local offset — updates instantly, no debounce lag
-            color:      offset === 0 ? '#4ade80' : '#67e8f9',
+            color:      offset === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
             textShadow: offset === 0
-              ? '0 0 8px rgba(74,222,128,0.5)'
-              : '0 0 8px rgba(103,232,249,0.5)',
+              ? '0 0 10px rgba(120,200,160,0.25)'
+              : '0 0 10px rgba(140,190,230,0.22)',
           }}
         >
           {labelFromOffset(offset, todayRef.current)}
@@ -127,7 +127,7 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
             className="text-[9px] px-3 py-1.5 rounded tracking-[0.2em] border transition-colors"
             style={playing
               ? { borderColor: 'rgba(239,68,68,0.5)', color: '#f87171', background: 'rgba(239,68,68,0.08)' }
-              : { borderColor: 'rgba(14,165,233,0.4)', color: '#38bdf8', background: 'transparent' }
+              : { borderColor: 'rgba(140,180,220,0.25)', color: 'rgba(170,205,235,0.65)', background: 'transparent' }
             }
           >
             {playing ? '■ STOP' : '▶ PLAY'}
@@ -135,7 +135,7 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
           <button
             onClick={handleNow}
             className="text-[9px] px-3 py-1.5 rounded tracking-[0.2em] border transition-colors"
-            style={{ borderColor: 'rgba(74,222,128,0.4)', color: '#4ade80', background: 'transparent' }}
+            style={{ borderColor: 'rgba(120,190,160,0.25)', color: 'rgba(150,210,185,0.65)', background: 'transparent' }}
           >
             ◉ NOW
           </button>
@@ -148,8 +148,8 @@ export default function TimelineSlider({ value, onChange, onSeek }) {
           className="absolute top-1/2 left-0 h-[3px] rounded -translate-y-1/2 pointer-events-none"
           style={{
             width: `${pct}%`,
-            background: 'linear-gradient(to right, #0369a1, #7c3aed)',
-            boxShadow: '0 0 6px rgba(124,58,237,0.35)',
+            background: 'linear-gradient(to right, rgba(14,100,160,0.4), rgba(180,210,240,0.7))',
+            boxShadow: '0 0 4px rgba(180,215,245,0.18)',
           }}
         />
         <input

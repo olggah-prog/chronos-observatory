@@ -196,7 +196,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           <g key={i}>
             <path d={seg.path} fill="rgba(255,255,255,0.016)" stroke="rgba(255,255,255,0.09)" strokeWidth="0.4"/>
             <text x={seg.labelPos.x} y={seg.labelPos.y} textAnchor="middle" dominantBaseline="middle"
-              fontSize="21" fill="rgba(200,208,220,0.60)" style={{ fontFamily: 'serif', userSelect: 'none' }}>
+              fontSize="21" fill="rgba(200,208,220,0.72)" style={{ fontFamily: 'serif', userSelect: 'none' }}>
               {seg.symbol}
             </text>
           </g>
@@ -254,7 +254,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
                   <text x={lonXY(s.lon, R.starRing + 9).x} y={lonXY(s.lon, R.starRing + 9).y}
                     textAnchor={rimAnchor(lonXY(s.lon, R.starRing + 9))} dominantBaseline="middle"
                     fontSize="5.8"
-                    fill="rgba(255,245,175,0.82)"
+                    fill="rgba(255,245,175,0.90)"
                     style={{ fontFamily: 'monospace', letterSpacing: '0.3px' }}>
                     {s.name}
                   </text>
