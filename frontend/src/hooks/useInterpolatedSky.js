@@ -49,7 +49,7 @@ export function useInterpolatedSky(rawData, seekDt) {
     const next = {
       ...targetRef.current,
       planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
-      angles:  lerpAngles(fromRef.current?.angles,  targetRef.current.angles,  done ? 1 : t),
+      angles:  targetRef.current.angles,
     }
 
     displayedRef.current = next
