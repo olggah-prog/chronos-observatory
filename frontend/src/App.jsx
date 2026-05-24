@@ -88,6 +88,10 @@ export default function App() {
   const [showStars,   setShowStars]   = useState(true)
   const [cityName,    setCityName]    = useState('')
 
+
+  const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
+  const data = useInterpolatedSky(rawData)
+
   useEffect(() => {
     if (!data?.observer || cityName) return
     const { lat, lon } = data.observer
@@ -99,8 +103,6 @@ export default function App() {
       })
       .catch(() => {})
   }, [data])
-  const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
-  const data = useInterpolatedSky(rawData)
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
   useEffect(() => {
