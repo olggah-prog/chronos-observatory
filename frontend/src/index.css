@@ -19,7 +19,7 @@ html, body {
 
 @layer base {
   body {
-    background: #020812;
+    background: var(--bg-page, #020812);
     color: #e2e8f0;
     font-family: 'Share Tech Mono', 'Courier New', monospace;
     -webkit-font-smoothing: antialiased;
