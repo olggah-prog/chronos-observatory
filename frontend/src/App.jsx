@@ -167,7 +167,7 @@ export default function App() {
 
         {data && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
               <div>
                 <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
