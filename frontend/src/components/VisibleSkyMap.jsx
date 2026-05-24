@@ -142,17 +142,20 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
         <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full block">
           <defs>
             <linearGradient id="vsSkyBg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#010305" />
-              <stop offset="68%"  stopColor="#010810" />
-              <stop offset="100%" stopColor="#020d18" />
+              <stop offset="0%"   stopColor="#010306" />
+              <stop offset="40%"  stopColor="#010a14" />
+              <stop offset="78%"  stopColor="#021220" />
+              <stop offset="100%" stopColor="#031828" />
             </linearGradient>
             <linearGradient id="vsAtmBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#082030" stopOpacity="0"    />
-              <stop offset="100%" stopColor="#0a2030" stopOpacity="0.13" />
+              <stop offset="0%"   stopColor="#061828" stopOpacity="0"    />
+              <stop offset="60%"  stopColor="#082230" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#0a2838" stopOpacity="0.22" />
             </linearGradient>
             <linearGradient id="vsTwilight" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#180800" stopOpacity="0"    />
-              <stop offset="100%" stopColor="#220c00" stopOpacity="0.22" />
+              <stop offset="0%"   stopColor="#0a1828" stopOpacity="0"    />
+              <stop offset="35%"  stopColor="#1a0e04" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#2a1004" stopOpacity="0.32" />
             </linearGradient>
             <filter id="vsPGlow" x="-80%" y="-80%" width="260%" height="260%">
               <feGaussianBlur stdDeviation="2.2" result="blur"/>
@@ -165,7 +168,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
 
           {/* Sky + ground */}
           <rect x="0" y="0" width={VW} height={HORIZON_Y} fill="url(#vsSkyBg)"/>
-          <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill="#010406"/>
+          <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill="#010508"/>
 
           {/* Background stars */}
           <g clipPath="url(#vsSkyClip)">
@@ -205,8 +208,8 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
           })}
 
           {/* Twilight warm band + atmospheric scatter */}
-          <rect x="0" y={HORIZON_Y - 72} width={VW} height="72" fill="url(#vsTwilight)"/>
-          <rect x="0" y={HORIZON_Y - 32} width={VW} height="32" fill="url(#vsAtmBlue)"/>
+          <rect x="0" y={HORIZON_Y - 96} width={VW} height="96" fill="url(#vsTwilight)"/>
+          <rect x="0" y={HORIZON_Y - 52} width={VW} height="52" fill="url(#vsAtmBlue)"/>
 
           {/* Horizon line */}
           <line x1="0" y1={HORIZON_Y} x2={VW} y2={HORIZON_Y}
