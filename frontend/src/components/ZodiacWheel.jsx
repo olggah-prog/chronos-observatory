@@ -177,9 +177,9 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
           <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="var(--wheel-bg, #070f1c)"/>
-            <stop offset="70%"  stopColor="var(--wheel-bg, #040c16)"/>
-            <stop offset="100%" stopColor="var(--wheel-bg, #030a12)"/>
+            <stop offset="0%"   stopColor="#070f1c"/>
+            <stop offset="70%"  stopColor="#040c16"/>
+            <stop offset="100%" stopColor="#030a12"/>
           </radialGradient>
           <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stopColor="white" stopOpacity="0"/>

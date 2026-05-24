@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { applyTheme, modeFromSunAlt } from './utils/observatoryTheme'
+import { useState, useEffect, useMemo } from 'react'
 import { useSkyData } from './hooks/useSkyData'
 import { useInterpolatedSky } from './hooks/useInterpolatedSky'
 import ZodiacWheel       from './components/ZodiacWheel'
@@ -87,18 +86,8 @@ export default function App() {
   const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
-  const [lightMode, setLightMode]     = useState('auto')
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
   const data = useInterpolatedSky(rawData)
-
-  useEffect(() => {
-    if (lightMode === 'auto') {
-      const sun = data?.planets?.find(p => p.name === 'Sun')
-      applyTheme(modeFromSunAlt(sun?.altitude))
-    } else {
-      applyTheme(lightMode)
-    }
-  }, [lightMode, data])
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
   useEffect(() => {
@@ -115,11 +104,11 @@ export default function App() {
   const meta         = data?.meta         ?? {}
 
   return (
-    <div className="min-h-screen text-slate-100 overflow-x-hidden font-readout" style={{ background: "var(--bg-page)", transition: "background 0.8s ease" }}>
+    <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout">
       <div className="fixed inset-0 pointer-events-none select-none"><StarField /></div>
       {(seeking || loading) && data && !isPlaying && <LoadingBar />}
 
-      <header className="relative z-10 border-b border-cyan-900/30 backdrop-blur-sm" style={{ background: "var(--bg-header)", transition: "background 0.8s ease" }}>
+      <header className="relative z-10 border-b border-cyan-900/30 bg-[#020812]/85 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-5 py-4">
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
@@ -128,20 +117,6 @@ export default function App() {
               <p className="text-[9px] tracking-[0.45em] text-slate-600 mt-0.5 uppercase">Planetary Telemetry · Swiss Ephemeris Engine</p>
             </div>
             <div className="text-right">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginBottom: '4px' }}>
-                {['auto','day','dusk','night'].map(m => (
-                  <button key={m} onClick={() => setLightMode(m)}
-                    style={{
-                      fontFamily: 'monospace', fontSize: '7px', letterSpacing: '0.15em',
-                      padding: '2px 5px',
-                      background: lightMode === m ? 'rgba(180,210,240,0.10)' : 'transparent',
-                      border: lightMode === m ? '1px solid rgba(180,210,240,0.22)' : '1px solid transparent',
-                      borderRadius: '2px',
-                      color: lightMode === m ? 'rgba(200,220,245,0.80)' : 'rgba(100,130,165,0.40)',
-                      cursor: 'pointer', textTransform: 'uppercase', transition: 'all 0.25s',
-                    }}>{m}</button>
-                ))}
-              </div>
               <LiveClock />
               {!selectedDt && (
                 <div className="flex items-center gap-1.5 justify-end mt-1">
