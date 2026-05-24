@@ -56,7 +56,7 @@ function Row({ name }) {
   )
 }
 
-export default function SystemsDropdown({ observer = null, observer = null, showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
+export default function SystemsDropdown({ observer = null, showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
