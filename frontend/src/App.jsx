@@ -128,6 +128,20 @@ export default function App() {
               <p className="text-[9px] tracking-[0.45em] text-slate-600 mt-0.5 uppercase">Planetary Telemetry · Swiss Ephemeris Engine</p>
             </div>
             <div className="text-right">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginBottom: '4px' }}>
+                {['auto','day','dusk','night'].map(m => (
+                  <button key={m} onClick={() => setLightMode(m)}
+                    style={{
+                      fontFamily: 'monospace', fontSize: '7px', letterSpacing: '0.15em',
+                      padding: '2px 5px',
+                      background: lightMode === m ? 'rgba(180,210,240,0.10)' : 'transparent',
+                      border: lightMode === m ? '1px solid rgba(180,210,240,0.22)' : '1px solid transparent',
+                      borderRadius: '2px',
+                      color: lightMode === m ? 'rgba(200,220,245,0.80)' : 'rgba(100,130,165,0.40)',
+                      cursor: 'pointer', textTransform: 'uppercase', transition: 'all 0.25s',
+                    }}>{m}</button>
+                ))}
+              </div>
               <LiveClock />
               {!selectedDt && (
                 <div className="flex items-center gap-1.5 justify-end mt-1">
