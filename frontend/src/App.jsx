@@ -144,7 +144,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-5 pt-1 pb-4 space-y-2">
+      <main className="relative z-10 max-w-7xl mx-auto px-5 pt-0 pb-4 space-y-1">
         {!data && loading && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center space-y-3">
@@ -167,7 +167,7 @@ export default function App() {
 
         {data && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center" style={{ marginTop: '-48px' }}>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
               <div>
                 <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
