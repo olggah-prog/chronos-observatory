@@ -124,7 +124,7 @@ export default function App() {
       {(seeking || loading) && data && !isPlaying && <LoadingBar />}
 
       <header className="relative z-10 border-b border-cyan-900/30 bg-[#020812]/85 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-5 py-4">
+        <div className="max-w-7xl mx-auto px-5 py-2">
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
               <h1 className="text-xl sm:text-2xl font-black tracking-[0.18em] text-white font-display"
@@ -144,7 +144,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-5 pt-0 pb-4 space-y-1">
+      <main className="relative z-10 max-w-7xl mx-auto px-5 pt-0 pb-0 space-y-0">
         {!data && loading && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center space-y-3">
@@ -167,7 +167,7 @@ export default function App() {
 
         {data && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 items-center">
               <div>
                 <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
