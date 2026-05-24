@@ -1,3 +1,18 @@
+
+:root {
+  --bg-page: #020812;
+  --bg-header: rgba(2,8,18,0.85);
+  --bg-panel: rgba(5,14,26,0.70);
+  --bg-panel-border: rgba(14,165,233,0.12);
+  --text-primary: rgba(200,215,235,0.82);
+  --text-secondary: rgba(130,155,185,0.55);
+}
+
+html, body {
+  background: var(--bg-page) !important;
+  transition: background 0.8s ease;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

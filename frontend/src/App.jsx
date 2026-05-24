@@ -115,11 +115,11 @@ export default function App() {
   const meta         = data?.meta         ?? {}
 
   return (
-    <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout">
+    <div className="min-h-screen text-slate-100 overflow-x-hidden font-readout" style={{ background: "var(--bg-page)", transition: "background 0.8s ease" }}>
       <div className="fixed inset-0 pointer-events-none select-none"><StarField /></div>
       {(seeking || loading) && data && !isPlaying && <LoadingBar />}
 
-      <header className="relative z-10 border-b border-cyan-900/30 bg-[#020812]/85 backdrop-blur-sm">
+      <header className="relative z-10 border-b border-cyan-900/30 backdrop-blur-sm" style={{ background: "var(--bg-header)", transition: "background 0.8s ease" }}>
         <div className="max-w-7xl mx-auto px-5 py-4">
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>

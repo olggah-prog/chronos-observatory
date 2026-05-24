@@ -3,7 +3,10 @@
 
 export const THEMES = {
   night: {
-    '--bg-page':        'radial-gradient(ellipse at 50% 0%, #07101e 0%, #020609 100%)',
+    '--bg-page':        '#020812',
+    '--bg-header':      'rgba(2,8,18,0.88)',
+    '--bg-panel':       'rgba(5,14,26,0.70)',
+    '--bg-panel-border':'rgba(14,165,233,0.12)',
     '--bg-panel':       'rgba(5,14,26,0.70)',
     '--bg-panel-border':'rgba(180,210,240,0.10)',
     '--sky-top':        '#010306',
@@ -16,7 +19,10 @@ export const THEMES = {
     '--star-op':        '1.0',
   },
   dusk: {
-    '--bg-page':        'radial-gradient(ellipse at 50% 0%, #0e1828 0%, #060c18 100%)',
+    '--bg-page':        '#060d1a',
+    '--bg-header':      'rgba(6,12,24,0.90)',
+    '--bg-panel':       'rgba(8,16,30,0.75)',
+    '--bg-panel-border':'rgba(180,140,80,0.15)',
     '--bg-panel':       'rgba(8,18,32,0.72)',
     '--bg-panel-border':'rgba(200,220,245,0.13)',
     '--sky-top':        '#020510',
@@ -29,7 +35,10 @@ export const THEMES = {
     '--star-op':        '0.85',
   },
   day: {
-    '--bg-page':        'radial-gradient(ellipse at 50% 0%, #1a2840 0%, #0d1828 100%)',
+    '--bg-page':        '#0d1828',
+    '--bg-header':      'rgba(14,24,42,0.92)',
+    '--bg-panel':       'rgba(14,26,46,0.80)',
+    '--bg-panel-border':'rgba(140,180,220,0.18)',
     '--bg-panel':       'rgba(12,22,40,0.78)',
     '--bg-panel-border':'rgba(200,225,255,0.16)',
     '--sky-top':        '#06101e',
