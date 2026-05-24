@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { applyTheme, modeFromSunAlt } from './utils/observatoryTheme'
 import { useSkyData } from './hooks/useSkyData'
 import { useInterpolatedSky } from './hooks/useInterpolatedSky'
 import ZodiacWheel       from './components/ZodiacWheel'
@@ -86,8 +87,18 @@ export default function App() {
   const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
+  const [lightMode, setLightMode]     = useState('auto')
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
   const data = useInterpolatedSky(rawData)
+
+  useEffect(() => {
+    if (lightMode === 'auto') {
+      const sun = data?.planets?.find(p => p.name === 'Sun')
+      applyTheme(modeFromSunAlt(sun?.altitude))
+    } else {
+      applyTheme(lightMode)
+    }
+  }, [lightMode, data])
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
   useEffect(() => {
