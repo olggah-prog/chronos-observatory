@@ -83,10 +83,10 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
   const sunAlt   = planets.find(p => p.name === 'Sun')?.altitude ?? -90
   const skyPhase = sunAlt > 5 ? 'day' : sunAlt > -6 ? 'golden' : sunAlt > -12 ? 'twilight' : 'night'
   const SKY = {
-    day:      { top: '#0e1e38', mid: '#1a2e50', bot: '#243858', twC: '#1a3040', twOp: 0.18 },
-    golden:   { top: '#060c1a', mid: '#0c1828', bot: '#162030', twC: '#c87820', twOp: 0.62 },
-    twilight: { top: '#030608', mid: '#060c18', bot: '#0a1220', twC: '#8a4010', twOp: 0.42 },
-    night:    { top: '#010306', mid: '#010a14', bot: '#031828', twC: '#220c00', twOp: 0.22 },
+    day:      { top: '#162840', mid: '#1e3858', bot: '#284870', twC: '#2a4060', twOp: 0.25 },
+    golden:   { top: '#060a18', mid: '#0a1428', bot: '#141e38', twC: '#c87820', twOp: 0.68 },
+    twilight: { top: '#020408', mid: '#04080e', bot: '#060c16', twC: '#8a3808', twOp: 0.48 },
+    night:    { top: '#010204', mid: '#010608', bot: '#010c14', twC: '#180800', twOp: 0.14 },
   }
   const sky = SKY[skyPhase]
 
