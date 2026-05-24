@@ -126,20 +126,6 @@ export default function App() {
               )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-[9px] tracking-[0.25em] text-slate-600 uppercase">
-            <span>Backend: <span className={error ? 'text-red-400' : 'text-green-400'}>{error ? 'ERROR' : 'ONLINE'}</span></span>
-            <span>Bodies: <span className="text-cyan-400">{data?.planets.length ?? '—'}</span></span>
-            <span>Visible: <span className="text-green-400">{visibleCount || '—'}</span></span>
-            <span>Retrograde: <span className={retroCount > 0 ? 'text-red-400' : 'text-slate-500'}>{retroCount}</span></span>
-            {stars.length > 0 && <span>Stars: <span className="text-amber-400/70">{stars.length}</span></span>}
-            {conjunctions.length > 0 && <span>Contacts: <span className="text-amber-300/60">{conjunctions.length}</span></span>}
-            {data && <span>JD: <span className="text-cyan-400">{data.julian_day}</span></span>}
-            {data?.observer && (
-              <span>Observer: <span className="text-cyan-400">
-                {data.observer.lat.toFixed(2)}°N {Math.abs(data.observer.lon).toFixed(2)}°{data.observer.lon >= 0 ? 'E' : 'W'}
-              </span></span>
-            )}
-          </div>
         </div>
       </header>
 
@@ -168,7 +154,7 @@ export default function App() {
           <>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-center">
               <div>
-                <SystemsDropdown showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
+                <SystemsDropdown observer={data?.observer ?? null} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
               </div>
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
