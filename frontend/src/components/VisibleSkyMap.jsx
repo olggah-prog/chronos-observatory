@@ -84,6 +84,26 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
     const moonWaxing = ((moonLon - sunLon + 360) % 360) < 180
+    const sunAlt  = planets.find(p => p.name === 'Sun')?.altitude ?? -90
+    const skyPhase = sunAlt > 5 ? 'day' : sunAlt > -6 ? 'golden' : sunAlt > -12 ? 'twilight' : 'night'
+    const SKY = {
+      day:      { top: '#0e1e38', mid: '#1a2e50', bot: '#243858', twC: '#1a2030', twOp: 0.15 },
+      golden:   { top: '#080e1e', mid: '#0e1a30', bot: '#1a2840', twC: '#3a1e02', twOp: 0.55 },
+      twilight: { top: '#040810', mid: '#080e1c', bot: '#0c1628', twC: '#241204', twOp: 0.38 },
+      night:    { top: '#010306', mid: '#010a14', bot: '#031828', twC: '#220c00', twOp: 0.22 },
+    }
+    const sky = SKY[skyPhase]
+    const sunAlt = planets.find(p => p.name === 'Sun')?.altitude ?? -90
+    const skyPhase = sunAlt > 5 ? 'day' : sunAlt > -6 ? 'golden' : sunAlt > -12 ? 'twilight' : 'night'
+
+    // Sky colors per phase
+    const SKY = {
+      day:      { top: '#0e1e38', mid: '#1a2e50', bot: '#243858', twC: '#1a2030', twOp: 0.15 },
+      golden:   { top: '#080e1e', mid: '#0e1a30', bot: '#1a2840', twC: '#3a1e02', twOp: 0.55 },
+      twilight: { top: '#040810', mid: '#080e1c', bot: '#0c1628', twC: '#241204', twOp: 0.38 },
+      night:    { top: '#010306', mid: '#010a14', bot: '#031828', twC: '#220c00', twOp: 0.22 },
+    }
+    const sky = SKY[skyPhase]
 
     return planets
       .filter(p => p.above_horizon)
@@ -142,10 +162,9 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
         <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full block">
           <defs>
             <linearGradient id="vsSkyBg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#010306" />
-              <stop offset="40%"  stopColor="#010a14" />
-              <stop offset="78%"  stopColor="#021220" />
-              <stop offset="100%" stopColor="#031828" />
+              <stop offset="0%"   stopColor={sky.top} />
+              <stop offset="50%"  stopColor={sky.mid} />
+              <stop offset="100%" stopColor={sky.bot} />
             </linearGradient>
             <linearGradient id="vsAtmBlue" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%"   stopColor="#061828" stopOpacity="0"    />
@@ -153,9 +172,9 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               <stop offset="100%" stopColor="#0a2838" stopOpacity="0.22" />
             </linearGradient>
             <linearGradient id="vsTwilight" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#0a1828" stopOpacity="0"    />
-              <stop offset="35%"  stopColor="#1a0e04" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#2a1004" stopOpacity="0.32" />
+              <stop offset="0%"   stopColor={sky.twC} stopOpacity="0" />
+              <stop offset="40%"  stopColor={sky.twC} stopOpacity={sky.twOp * 0.4} />
+              <stop offset="100%" stopColor={sky.twC} stopOpacity={sky.twOp} />
             </linearGradient>
             <filter id="vsPGlow" x="-80%" y="-80%" width="260%" height="260%">
               <feGaussianBlur stdDeviation="2.2" result="blur"/>
