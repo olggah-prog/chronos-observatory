@@ -56,7 +56,7 @@ function Row({ name }) {
   )
 }
 
-export default function SystemsDropdown({ observer = null, showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
+export default function SystemsDropdown({ observer = null, cityName = '', showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -88,7 +88,7 @@ export default function SystemsDropdown({ observer = null, showPlanets = true, s
           padding: '4px 10px 4px 0',
           borderBottom: open ? '1px solid rgba(180,200,230,0.15)' : '1px solid transparent',
         }}>
-        {observer ? `${observer.lat.toFixed(1)}°${observer.lat >= 0 ? 'N' : 'S'} · ${Math.abs(observer.lon).toFixed(1)}°${observer.lon >= 0 ? 'E' : 'W'}` : 'SIDEREAL SYMBOLIC SKY'}
+        {observer ? (cityName ? `${cityName} · ${observer.lat.toFixed(2)}°${observer.lat >= 0 ? 'N' : 'S'} ${Math.abs(observer.lon).toFixed(2)}°${observer.lon >= 0 ? 'E' : 'W'}` : `${observer.lat.toFixed(2)}°${observer.lat >= 0 ? 'N' : 'S'} · ${Math.abs(observer.lon).toFixed(2)}°${observer.lon >= 0 ? 'E' : 'W'}`) : 'SIDEREAL SYMBOLIC SKY'}
         <span style={{
           fontSize: '7px',
           opacity: 0.6,
