@@ -98,7 +98,7 @@ export default function App() {
         if (city) setCityName(city.toUpperCase())
       })
       .catch(() => {})
-  }, [data?.observer])
+  }, [data])
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
   const data = useInterpolatedSky(rawData)
 
