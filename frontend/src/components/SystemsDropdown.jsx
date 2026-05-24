@@ -85,7 +85,7 @@ export default function SystemsDropdown({ observer = null, cityName = '', showPl
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '4px 10px 4px 0',
+          padding: '2px 10px 2px 0',
           borderBottom: open ? '1px solid rgba(180,200,230,0.15)' : '1px solid transparent',
         }}>
         {observer ? (cityName || (observer.lat.toFixed(2) + (observer.lat >= 0 ? '°N' : '°S') + ' · ' + Math.abs(observer.lon).toFixed(2) + (observer.lon >= 0 ? '°E' : '°W'))) : 'SIDEREAL SYMBOLIC SKY'}

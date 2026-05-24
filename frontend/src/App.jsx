@@ -144,7 +144,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 max-w-7xl mx-auto px-5 py-3 space-y-4">
+      <main className="relative z-10 max-w-7xl mx-auto px-5 pt-1 pb-4 space-y-2">
         {!data && loading && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center space-y-3">
