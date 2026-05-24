@@ -165,8 +165,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
 
   return (
     <div className="flex items-center justify-center w-full">
-      <svg ref={svgRef} viewBox="-36 -36 672 672" className="w-full"
-        style={{ filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
+      <svg ref={svgRef} viewBox="-36 -36 672 672"
+        style={{ width: 'clamp(380px, 44vw, 720px)', height: 'clamp(380px, 44vw, 720px)', filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
         <defs>
           <filter id="pGlow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="0.5" result="blur"/>
