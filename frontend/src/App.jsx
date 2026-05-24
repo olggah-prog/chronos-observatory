@@ -86,6 +86,19 @@ export default function App() {
   const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
+  const [cityName,    setCityName]    = useState('')
+
+  useEffect(() => {
+    if (!data?.observer || cityName) return
+    const { lat, lon } = data.observer
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json')
+      .then(r => r.json())
+      .then(d => {
+        const city = d.address?.city || d.address?.town || d.address?.village || ''
+        if (city) setCityName(city.toUpperCase())
+      })
+      .catch(() => {})
+  }, [data?.observer])
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
   const data = useInterpolatedSky(rawData)
 
@@ -154,7 +167,7 @@ export default function App() {
           <>
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-center">
               <div>
-                <SystemsDropdown observer={data?.observer ?? null} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
+                <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
               </div>
               <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
