@@ -91,7 +91,7 @@ export default function App() {
   useEffect(() => {
     if (!data?.observer || cityName) return
     const { lat, lon } = data.observer
-    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json')
+    fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lon + '&format=json', { headers: { 'Accept-Language': 'en', 'User-Agent': 'ChronosObservatory/1.0' } })
       .then(r => r.json())
       .then(d => {
         const city = d.address?.city || d.address?.town || d.address?.village || ''
