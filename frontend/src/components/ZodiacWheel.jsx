@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useRef, useCallback } from 'react'
+import PlanetLabel from './PlanetLabel'
 import { PLANET_META, ZODIAC_META } from '../utils/planets'
 
 const CX = 300, CY = 300
@@ -80,6 +81,9 @@ function AxisArrow({ lon, label, endR, lblR, lyOff = 0, minor = false }) {
 }
 
 export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true }) {
+  const [activeP, setActiveP] = useState(null)
+  const svgRef = useRef(null)
+
   const segments = useMemo(() =>
     ZODIAC_META.map((sign, i) => ({
       ...sign,
@@ -161,7 +165,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
 
   return (
     <div className="flex items-center justify-center w-full">
-      <svg viewBox="-36 -36 672 672" className="w-full max-w-[540px]"
+      <svg ref={svgRef} viewBox="-36 -36 672 672" className="w-full max-w-[540px]"
         style={{ filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
         <defs>
           <filter id="pGlow" x="-30%" y="-30%" width="160%" height="160%">
@@ -288,7 +292,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             return (
               <g key={p.name}>
                 <title>{p.name} {p.zodiac_sign} {p.longitude.toFixed(2)}{p.retrograde ? ' R' : ''}</title>
-                <circle cx={p.pos.x} cy={p.pos.y} r="13" fill="transparent" style={{ cursor: 'default' }}/>
+                <circle cx={p.pos.x} cy={p.pos.y} r="13" fill="transparent" style={{ cursor: 'pointer' }}
+                  onClick={() => setActiveP(activeP?.name === p.name ? null : p)}/>
                 <text x={p.pos.x} y={p.pos.y} textAnchor="middle" dominantBaseline="middle"
                   fontSize={sz} fill="rgba(220,225,235,0.88)"
                   style={{ fontFamily: 'serif', userSelect: 'none', pointerEvents: 'none' }}>
@@ -316,6 +321,15 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
           SYMBOLIC SKY · SIDEREAL MODE
         </text>
       </svg>
+      {activeP && (
+        <PlanetLabel
+          planet={activeP}
+          conjunctions={conjunctions}
+          pos={planetPositions.find(pp => pp.name === activeP.name)?.pos}
+          svgRect={svgRef.current?.getBoundingClientRect()}
+          onClose={() => setActiveP(null)}
+        />
+      )}
     </div>
   )
 }
