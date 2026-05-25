@@ -137,7 +137,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
   const axisPoints = useMemo(() => {
     if (!angles) return []
     const endR = R.zodiacInner - 3
-    const lblR = R.outerRim + 22
+    const lblR = R.outerRim + 12
     const items = [
       { lon: angles.asc, label: 'ASC' },
       { lon: angles.dsc, label: 'DSC' },
