@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSkyData } from './hooks/useSkyData'
+import { getSkyMode, SKY_VARS } from './utils/atmosphere'
+import AtmosphericLayers from './components/AtmosphericLayers'
 import { useInterpolatedSky } from './hooks/useInterpolatedSky'
 import ZodiacWheel       from './components/ZodiacWheel'
 import VisibleSkyMap     from './components/VisibleSkyMap'
@@ -91,6 +93,8 @@ export default function App() {
 
   const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
   const data = useInterpolatedSky(rawData)
+  const skyMode = data ? getSkyMode(data.planets) : 'night'
+  const skyVars = SKY_VARS[skyMode]
 
   useEffect(() => {
     if (!data?.observer || cityName) return
@@ -119,8 +123,10 @@ export default function App() {
   const meta         = data?.meta         ?? {}
 
   return (
-    <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout">
+    <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout"
+      style={skyVars}>
       <div className="fixed inset-0 pointer-events-none select-none"><StarField /></div>
+      <AtmosphericLayers skyMode={skyMode}/>
       {(seeking || loading) && data && !isPlaying && <LoadingBar />}
 
       <header className="relative z-10 border-b border-cyan-900/30 bg-[#020812]/85 backdrop-blur-sm">
