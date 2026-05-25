@@ -11,6 +11,10 @@ export default defineConfig({
         rewrite: path => path.replace(/^\/api/, ''),
         changeOrigin: true,
       },
+      '/sky': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
 })
