@@ -167,12 +167,12 @@ export default function App() {
 
         {data && (
           <>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 items-center">
-              <div>
-                <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 items-start">
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
+                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
               </div>
-              <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
             </div>
 
             <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
