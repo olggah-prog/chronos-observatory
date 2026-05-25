@@ -169,7 +169,7 @@ export default function App() {
           <>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 items-center">
+              <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "minmax(440px, 560px) 1fr" }}>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
                 <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
               </div>
