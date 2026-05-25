@@ -164,9 +164,9 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
   }, [angles])
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div style={{ width: 'clamp(360px, 44vw, 680px)', height: 'clamp(360px, 44vw, 680px)', position: 'relative', overflow: 'visible', flexShrink: 0 }}>
       <svg ref={svgRef} viewBox="-36 -36 672 672"
-        style={{ width: 'clamp(420px, 52vw, 860px)', height: 'clamp(420px, 52vw, 860px)', filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
+        style={{ position: 'absolute', top: '-8.6%', left: '-8.6%', width: '117.2%', height: '117.2%', filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
         <defs>
           <filter id="pGlow" x="-30%" y="-30%" width="160%" height="160%">
             <feGaussianBlur stdDeviation="0.5" result="blur"/>
