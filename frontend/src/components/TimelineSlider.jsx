@@ -161,7 +161,7 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
         marginBottom: '6px',
         color: isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
         transition: 'color 0.15s ease',
-        visibility: offsetHours === 0 ? 'hidden' : 'visible',
+        opacity: offsetHours === 0 ? 0.35 : 1,
       }}>
         {formatLabel(offsetHours, todayRef.current)}
         {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
