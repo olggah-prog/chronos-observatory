@@ -124,7 +124,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#020812] text-slate-100 overflow-x-hidden font-readout"
-      style={skyVars}>
+      style={{ ...skyVars, background: 'var(--sky-bg)', transition: 'background 3s ease' }}>
       <div className="fixed inset-0 pointer-events-none select-none"><StarField /></div>
       <AtmosphericLayers skyMode={skyMode}/>
       {(seeking || loading) && data && !isPlaying && <LoadingBar />}
@@ -176,7 +176,7 @@ export default function App() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
               <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
               <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "minmax(420px, 500px) minmax(0, 1fr)", justifyItems: "stretch", alignItems: "center" }}>
-                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars}/>
+                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode}/>
                 <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
               </div>
             </div>

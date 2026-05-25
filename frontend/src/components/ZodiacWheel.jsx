@@ -17,6 +17,12 @@ const R = {
   center:       22,
 }
 
+const WHEEL_BG = {
+  day:   { c0: '#1a3a5c', c70: '#142e4a', c100: '#0f2238', center: '#122840' },
+  dusk:  { c0: '#140820', c70: '#10061a', c100: '#0a0412', center: '#120618' },
+  night: { c0: '#070f1c', c70: '#040c16', c100: '#030a12', center: '#030911' },
+}
+
 const PLANET_SIZE = {
   Sun: 24, Moon: 20,
   Mercury: 18, Venus: 18, Mars: 18,
@@ -80,7 +86,7 @@ function AxisArrow({ lon, label, endR, lblR, lyOff = 0, minor = false }) {
   )
 }
 
-export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true }) {
+export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true, skyMode = "night" }) {
   const [activeP, setActiveP] = useState(null)
   const svgRef = useRef(null)
 
@@ -177,9 +183,9 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
           <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#070f1c"/>
-            <stop offset="70%"  stopColor="#040c16"/>
-            <stop offset="100%" stopColor="#030a12"/>
+            <stop offset="0%"   stopColor={(WHEEL_BG[skyMode]||WHEEL_BG.night).c0}/>
+            <stop offset="70%"  stopColor={(WHEEL_BG[skyMode]||WHEEL_BG.night).c70}/>
+            <stop offset="100%" stopColor={(WHEEL_BG[skyMode]||WHEEL_BG.night).c100}/>
           </radialGradient>
           <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
             <stop offset="0%"   stopColor="white" stopOpacity="0"/>
@@ -309,7 +315,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
             endR={a.endR} lblR={a.lblR} lyOff={a.lyOff} minor={a.minor}/>
         ))}
 
-        <circle cx={CX} cy={CY} r={R.center} fill="#030911" stroke="rgba(255,255,255,0.08)" strokeWidth="0.45"/>
+        <circle cx={CX} cy={CY} r={R.center} fill={(WHEEL_BG[skyMode]||WHEEL_BG.night).center} stroke="rgba(255,255,255,0.08)" strokeWidth="0.45"/>
         <circle cx={CX} cy={CY} r="9" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.35"/>
         <line x1={CX-18} y1={CY} x2={CX+18} y2={CY} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
         <line x1={CX} y1={CY-18} x2={CX} y2={CY+18} stroke="rgba(255,255,255,0.10)" strokeWidth="0.35"/>
