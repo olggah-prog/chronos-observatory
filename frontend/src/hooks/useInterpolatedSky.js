@@ -30,34 +30,42 @@ function lerpAngles(from, to, t) {
   }
 }
 
-// rawData — latest API response
-// seekDt  — live drag target (string ISO or '') for instant visual feedback
+// Extrapolate planet positions from a known snapshot by deltaHours
+function extrapolatePlanets(snapshot, deltaHours) {
+  if (!snapshot?.planets) return snapshot
+  return {
+    ...snapshot,
+    planets: snapshot.planets.map(p => ({
+      ...p,
+      longitude: ((p.longitude + p.speed_deg_per_day * deltaHours / 24) + 360) % 360,
+    }))
+  }
+}
+
 export function useInterpolatedSky(rawData, seekDt) {
   const displayedRef = useRef(null)
   const [displayed, setDisplayed] = useState(null)
 
-  const targetRef  = useRef(null)
-  const startRef   = useRef(null)
-  const fromRef    = useRef(null)
-  const rafRef     = useRef(null)
+  const targetRef = useRef(null)
+  const startRef  = useRef(null)
+  const fromRef   = useRef(null)
+  const rafRef    = useRef(null)
 
   const animate = useCallback(() => {
-    const now = performance.now()
-    const t   = easeOut((now - startRef.current) / INTERP_MS)
+    const now  = performance.now()
+    const t    = easeOut((now - startRef.current) / INTERP_MS)
     const done = t >= 1
 
     const next = {
       ...targetRef.current,
       planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
-      angles:  targetRef.current.angles,
+      angles:  lerpAngles(fromRef.current?.angles, targetRef.current.angles, done ? 1 : t),
     }
 
     displayedRef.current = next
     setDisplayed(next)
 
-    if (!done) {
-      rafRef.current = requestAnimationFrame(animate)
-    }
+    if (!done) rafRef.current = requestAnimationFrame(animate)
   }, [])
 
   // When new API data arrives — animate from current visual position
@@ -76,6 +84,22 @@ export function useInterpolatedSky(rawData, seekDt) {
     rafRef.current = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(rafRef.current)
   }, [rawData, animate])
+
+  // During drag: extrapolate locally from rawData using speed_deg_per_day
+  useEffect(() => {
+    if (!seekDt || !rawData?.timestamp_utc) return
+    const rawMs  = new Date(rawData.timestamp_utc).getTime()
+    const seekMs = new Date(seekDt).getTime()
+    const deltaHours = (seekMs - rawMs) / 3_600_000
+    if (Math.abs(deltaHours) < 0.01) return
+    console.log("[interp] seekDt delta hours:", deltaHours.toFixed(2))
+    const extrapolated = extrapolatePlanets(rawData, deltaHours)
+    cancelAnimationFrame(rafRef.current)
+    fromRef.current   = displayedRef.current || rawData
+    targetRef.current = extrapolated
+    startRef.current  = performance.now()
+    rafRef.current = requestAnimationFrame(animate)
+  }, [seekDt, rawData, animate])
 
   return displayed
 }

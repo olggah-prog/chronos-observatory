@@ -84,6 +84,7 @@ function LoadingBar() {
 
 export default function App() {
   const [selectedDt, setSelectedDt] = useState('')
+  const [seekDt, setSeekDt] = useState('')
   const deferredDt = useDeferredValue(selectedDt)
   const [seeking, setSeeking]       = useState(false)
   const [isPlaying, setIsPlaying]     = useState(false)
@@ -93,7 +94,7 @@ export default function App() {
 
 
   const { data: rawData, loading, error, refetch } = useSkyData(deferredDt)
-  const data = useInterpolatedSky(rawData)
+  const data = useInterpolatedSky(rawData, seekDt)
   const skyMode = data ? getSkyMode(data.planets) : 'night'
   const skyVars = SKY_VARS[skyMode]
 
@@ -182,7 +183,7 @@ export default function App() {
               </div>
             </div>
 
-            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
+            <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeekDt={setSeekDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
 
             <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
             <TelemetryPanel planets={data.planets}/>

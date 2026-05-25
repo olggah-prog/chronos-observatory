@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
-const API_DEBOUNCE_MS  = 100
 const PLAY_INTERVAL_MS = 400
+const DRAG_THROTTLE_MS = 600  // API call only after 600ms pause while dragging
 
-// Scale presets: label, step (hours), past range, future range
 const SCALES = [
   { label: '1H',  step: 1,   past: 24,    future: 6    },
   { label: '3H',  step: 3,   past: 72,    future: 12   },
@@ -31,48 +30,77 @@ function formatLabel(offsetHours, today) {
   String(d.getUTCMinutes()).padStart(2, '0') + ' UTC'
 }
 
-function formatTick(offsetHours, past, label) {
-  if (label === '24H') {
+function formatTick(offsetHours, scale) {
+  if (scale.label === '24H') {
     const d = Math.round(Math.abs(offsetHours) / 24)
-    return offsetHours < 0 ? `−${d}d` : offsetHours > 0 ? `+${d}d` : 'TODAY'
+    return offsetHours < 0 ? `−${d}d` : offsetHours > 0 ? `+${d}d` : 'NOW'
   }
-  if (Math.abs(offsetHours) >= 24) {
+  if (Math.abs(offsetHours) >= 24)
     return (offsetHours < 0 ? '−' : '+') + Math.round(Math.abs(offsetHours) / 24) + 'd'
-  }
   return (offsetHours < 0 ? '−' : '+') + Math.abs(offsetHours) + 'h'
 }
 
-export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }) {
+export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPlayChange }) {
   const [offsetHours, setOffsetHours] = useState(0)
   const [playing, setPlaying]         = useState(false)
-  const [scaleIdx, setScaleIdx]       = useState(4) // default 24H
+  const [isDragging, setIsDragging]   = useState(false)
+  const [scaleIdx, setScaleIdx]       = useState(4)
 
-  const scale       = SCALES[scaleIdx]
-  const todayRef    = useRef(new Date())
-  const playRef     = useRef(null)
-  const debounceRef = useRef(null)
+  const scale        = SCALES[scaleIdx]
+  const todayRef     = useRef(new Date())
+  const playRef      = useRef(null)
+  const throttleRef  = useRef(null)
+  const rafRef       = useRef(null)
+  const pendingHours = useRef(0)
 
-  function fireChange(hours) {
-    clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      if (hours === 0) onChange('')
-      else onChange(toIso(addHours(todayRef.current, hours)))
-    }, API_DEBOUNCE_MS)
-  }
+  // Commit to API — called after drag ends or throttle fires
+  const commitChange = useCallback((hours) => {
+    if (hours === 0) onChange('')
+    else onChange(toIso(addHours(todayRef.current, hours)))
+  }, [onChange])
 
-  function handleSlider(e) {
+  // During drag: update label instantly via rAF, throttle API
+  const handleSlider = useCallback((e) => {
     const hours = parseInt(e.target.value, 10)
-    setOffsetHours(hours)
+    pendingHours.current = hours
+
+    // Instant visual update via rAF
+    cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(() => {
+      setOffsetHours(hours)
+      const iso = hours === 0 ? '' : toIso(addHours(todayRef.current, hours))
+      onSeekDt?.(iso)
+    })
+
+    // Throttled API call
+    clearTimeout(throttleRef.current)
+    throttleRef.current = setTimeout(() => {
+      commitChange(hours)
+    }, DRAG_THROTTLE_MS)
+  }, [commitChange])
+
+  // On pointer up — commit immediately without waiting for throttle
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return
+    setIsDragging(false)
+    clearTimeout(throttleRef.current)
+    commitChange(pendingHours.current)
+    onSeek?.(false)
+  }, [isDragging, commitChange, onSeek])
+
+  const handlePointerDown = useCallback(() => {
+    setIsDragging(true)
     onSeek?.(true)
-    fireChange(hours)
-  }
+  }, [onSeek])
 
   function handleNow() {
     clearInterval(playRef.current)
-    clearTimeout(debounceRef.current)
+    clearTimeout(throttleRef.current)
+    cancelAnimationFrame(rafRef.current)
     setPlaying(false)
     onPlayChange?.(false)
     setOffsetHours(0)
+    pendingHours.current = 0
     onChange('')
   }
 
@@ -81,11 +109,11 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
     setPlaying(false)
     onPlayChange?.(false)
     setScaleIdx(idx)
-    // clamp current offset to new range
     const s = SCALES[idx]
     setOffsetHours(h => {
       const clamped = Math.max(-s.past, Math.min(s.future, h))
-      fireChange(clamped)
+      commitChange(clamped)
+      pendingHours.current = clamped
       return clamped
     })
   }
@@ -102,6 +130,7 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
     playRef.current = setInterval(() => {
       setOffsetHours(prev => {
         const next = prev >= scale.future ? -scale.past : prev + scale.step
+        pendingHours.current = next
         if (next === 0) onChange('')
         else onChange(toIso(addHours(todayRef.current, next)))
         return next
@@ -111,7 +140,8 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
 
   useEffect(() => () => {
     clearInterval(playRef.current)
-    clearTimeout(debounceRef.current)
+    clearTimeout(throttleRef.current)
+    cancelAnimationFrame(rafRef.current)
   }, [])
 
   const past   = scale.past
@@ -123,12 +153,11 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
       border: '1px solid rgba(180,210,240,0.10)',
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
-      {/* Row 1: label + scale buttons + play/now */}
+      {/* Row 1 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', gap: '8px' }}>
         <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase" style={{ flexShrink: 0 }}>
           Temporal Navigation
         </span>
-        {/* Scale selector */}
         <div style={{ display: 'flex', gap: '4px' }}>
           {SCALES.map((s, i) => (
             <button key={s.label} onClick={() => handleScale(i)}
@@ -141,7 +170,6 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
             </button>
           ))}
         </div>
-        {/* Play / Now */}
         <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
           <button onClick={togglePlay}
             className="text-[9px] px-3 py-1.5 rounded tracking-[0.2em] border transition-colors"
@@ -159,32 +187,40 @@ export default function TimelineSlider({ value, onChange, onSeek, onPlayChange }
         </div>
       </div>
 
-      {/* Row 2: current time label */}
+      {/* Row 2: time label */}
       <div style={{
         fontFamily: 'Orbitron, monospace',
         fontSize: '13px',
         letterSpacing: '0.05em',
         fontWeight: 'bold',
-        color: offsetHours === 0 ? 'rgba(180,220,200,0.85)' : 'rgba(180,210,240,0.80)',
+        color: offsetHours === 0 ? 'rgba(180,220,200,0.85)' : isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
         marginBottom: '12px',
         minHeight: '20px',
+        transition: 'color 0.15s ease',
       }}>
         {formatLabel(offsetHours, todayRef.current)}
+        {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
       </div>
 
       {/* Slider */}
       <input type="range"
         min={-past} max={future} step={scale.step}
         value={offsetHours}
-        onInput={handleSlider} onChange={handleSlider}
-        className="w-full"/>
+        onInput={handleSlider}
+        onChange={handleSlider}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handleDragEnd}
+        onPointerLeave={handleDragEnd}
+        className="w-full"
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      />
 
-      {/* Scale ticks */}
+      {/* Ticks */}
       <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
-        <span>{formatTick(-past, past, scale.label)}</span>
-        <span>{formatTick(-Math.round(past / 2), past, scale.label)}</span>
+        <span>{formatTick(-past, scale)}</span>
+        <span>{formatTick(-Math.round(past / 2), scale)}</span>
         <span style={{ color: offsetHours === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }}>NOW</span>
-        <span>{formatTick(future, past, scale.label)}</span>
+        <span>{formatTick(future, scale)}</span>
       </div>
     </div>
   )
