@@ -23,6 +23,7 @@ function lerpPlanets(from, to, t) {
 function lerpAngles(from, to, t) {
   if (!from || !to) return to
   return {
+    ...to,
     asc: lerpAngle(from.asc, to.asc, t),
     dsc: lerpAngle(from.dsc, to.dsc, t),
     mc:  lerpAngle(from.mc,  to.mc,  t),
