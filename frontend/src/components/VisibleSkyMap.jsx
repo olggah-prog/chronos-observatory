@@ -1,6 +1,33 @@
 import { useMemo } from 'react'
 import { PLANET_META } from '../utils/planets'
 
+const SKY_COLORS = {
+  day: {
+    sky:  ['#0a1e38', '#0f2d50', '#163d60', '#1a4870'],
+    atm:  ['#1a3a60', '#1e4870', '#205580'],
+    atmOp: [0, 0.12, 0.28],
+    twi:  ['#0a1e38', '#0d2040', '#102448'],
+    twiOp: [0, 0.05, 0.12],
+    ground: '#0a1828',
+  },
+  dusk: {
+    sky:  ['#06040f', '#0e0618', '#1a0820', '#280a1a'],
+    atm:  ['#1a0830', '#280a20', '#3a0e18'],
+    atmOp: [0, 0.15, 0.35],
+    twi:  ['#0a0415', '#2a0c08', '#4a1408'],
+    twiOp: [0, 0.20, 0.55],
+    ground: '#080308',
+  },
+  night: {
+    sky:  ['#010306', '#010a14', '#021220', '#031828'],
+    atm:  ['#061828', '#082230', '#0a2838'],
+    atmOp: [0, 0.08, 0.22],
+    twi:  ['#0a1828', '#1a0e04', '#2a1004'],
+    twiOp: [0, 0.08, 0.32],
+    ground: '#010508',
+  },
+}
+
 const VW        = 900
 const VH        = 500
 const HORIZON_Y = 390
@@ -79,7 +106,7 @@ function AngleMarker({ az, alt, label }) {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [] }) {
+export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [], skyMode = "night" }) {
   const bodies = useMemo(() => {
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
@@ -142,20 +169,20 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
         <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full block">
           <defs>
             <linearGradient id="vsSkyBg" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#010306" />
-              <stop offset="40%"  stopColor="#010a14" />
-              <stop offset="78%"  stopColor="#021220" />
-              <stop offset="100%" stopColor="#031828" />
+              <stop offset="0%"   stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).sky[0]} />
+              <stop offset="40%"  stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).sky[1]} />
+              <stop offset="78%"  stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).sky[2]} />
+              <stop offset="100%" stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).sky[3]} />
             </linearGradient>
             <linearGradient id="vsAtmBlue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#061828" stopOpacity="0"    />
-              <stop offset="60%"  stopColor="#082230" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#0a2838" stopOpacity="0.22" />
+              <stop offset="0%"   stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).atm[0]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).atmOp[0]} />
+              <stop offset="60%"  stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).atm[1]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).atmOp[1]} />
+              <stop offset="100%" stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).atm[2]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).atmOp[2]} />
             </linearGradient>
             <linearGradient id="vsTwilight" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#0a1828" stopOpacity="0"    />
-              <stop offset="35%"  stopColor="#1a0e04" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#2a1004" stopOpacity="0.32" />
+              <stop offset="0%"   stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).twi[0]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).twiOp[0]} />
+              <stop offset="35%"  stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).twi[1]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).twiOp[1]} />
+              <stop offset="100%" stopColor={(SKY_COLORS[skyMode]||SKY_COLORS.night).twi[2]} stopOpacity={(SKY_COLORS[skyMode]||SKY_COLORS.night).twiOp[2]} />
             </linearGradient>
             <filter id="vsPGlow" x="-80%" y="-80%" width="260%" height="260%">
               <feGaussianBlur stdDeviation="2.2" result="blur"/>
@@ -168,7 +195,7 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
 
           {/* Sky + ground */}
           <rect x="0" y="0" width={VW} height={HORIZON_Y} fill="url(#vsSkyBg)"/>
-          <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill="#010508"/>
+          <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill={(SKY_COLORS[skyMode]||SKY_COLORS.night).ground}/>
 
           {/* Background stars */}
           <g clipPath="url(#vsSkyClip)">

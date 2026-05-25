@@ -177,7 +177,7 @@ export default function App() {
               <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
               <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "minmax(420px, 500px) minmax(0, 1fr)", justifyItems: "stretch", alignItems: "center" }}>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode}/>
-                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null}/>
+                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode}/>
               </div>
             </div>
 
