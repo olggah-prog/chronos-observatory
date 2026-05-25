@@ -152,18 +152,20 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
       background: 'transparent',
     }}>
       {/* Time label — only show when not NOW */}
-      {offsetHours !== 0 && <div style={{
+      <div style={{
         fontFamily: 'Orbitron, monospace',
         fontSize: '11px',
         letterSpacing: '0.05em',
         fontWeight: 'bold',
-        color: isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
+        minHeight: '20px',
         marginBottom: '6px',
+        color: isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
         transition: 'color 0.15s ease',
+        visibility: offsetHours === 0 ? 'hidden' : 'visible',
       }}>
         {formatLabel(offsetHours, todayRef.current)}
         {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
-      </div>}
+      </div>
 
       {/* Slider */}
       <input type="range"
