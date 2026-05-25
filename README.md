@@ -1,3 +1,21 @@
+
+## Local Development
+
+```bash
+# One command to start everything:
+./dev.sh
+```
+
+This starts:
+- **Backend** (FastAPI + Swiss Ephemeris) on `http://localhost:8000`
+- **Frontend** (React + Vite) on `http://localhost:3000`
+
+Stop with `Ctrl+C`.
+
+### Claude Code
+Use Claude Code for editing and assistance only.
+The servers are managed by `./dev.sh` — not by Claude Code.
+
 # Chronos Observatory
 
 A FastAPI backend for real-time and historical planetary positions using the Swiss Ephemeris.
