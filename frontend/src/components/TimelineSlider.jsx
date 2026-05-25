@@ -153,11 +153,44 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
       border: '1px solid rgba(180,210,240,0.10)',
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
-      {/* Row 1 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', gap: '8px', flexWrap: 'wrap' }}>
-        <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase" style={{ flexShrink: 0 }}>
-          Temporal Navigation
-        </span>
+      {/* Time label — compact, above slider */}
+      <div style={{
+        fontFamily: 'Orbitron, monospace',
+        fontSize: '11px',
+        letterSpacing: '0.05em',
+        fontWeight: 'bold',
+        color: offsetHours === 0 ? 'rgba(180,220,200,0.85)' : isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
+        marginBottom: '6px',
+        minHeight: '16px',
+        transition: 'color 0.15s ease',
+      }}>
+        {formatLabel(offsetHours, todayRef.current)}
+        {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
+      </div>
+
+      {/* Slider */}
+      <input type="range"
+        min={-past} max={future} step={scale.step}
+        value={offsetHours}
+        onInput={handleSlider}
+        onChange={handleSlider}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handleDragEnd}
+        onPointerLeave={handleDragEnd}
+        className="w-full"
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      />
+
+      {/* Ticks */}
+      <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
+        <span>{formatTick(-past, scale)}</span>
+        <span>{formatTick(-Math.round(past / 2), scale)}</span>
+        <span style={{ color: offsetHours === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }}>NOW</span>
+        <span>{formatTick(future, scale)}</span>
+      </div>
+
+      {/* Controls below slider */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', gap: '8px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {SCALES.map((s, i) => (
             <button key={s.label} onClick={() => handleScale(i)}
@@ -185,42 +218,6 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
             ◉ NOW
           </button>
         </div>
-      </div>
-
-      {/* Row 2: time label */}
-      <div style={{
-        fontFamily: 'Orbitron, monospace',
-        fontSize: '13px',
-        letterSpacing: '0.05em',
-        fontWeight: 'bold',
-        color: offsetHours === 0 ? 'rgba(180,220,200,0.85)' : isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
-        marginBottom: '12px',
-        minHeight: '20px',
-        transition: 'color 0.15s ease',
-      }}>
-        {formatLabel(offsetHours, todayRef.current)}
-        {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
-      </div>
-
-      {/* Slider */}
-      <input type="range"
-        min={-past} max={future} step={scale.step}
-        value={offsetHours}
-        onInput={handleSlider}
-        onChange={handleSlider}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handleDragEnd}
-        onPointerLeave={handleDragEnd}
-        className="w-full"
-        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-      />
-
-      {/* Ticks */}
-      <div className="flex justify-between mt-1.5 text-[8px] text-slate-700 tracking-widest select-none">
-        <span>{formatTick(-past, scale)}</span>
-        <span>{formatTick(-Math.round(past / 2), scale)}</span>
-        <span style={{ color: offsetHours === 0 ? 'rgba(150,210,185,0.70)' : '#334155' }}>NOW</span>
-        <span>{formatTick(future, scale)}</span>
       </div>
     </div>
   )
