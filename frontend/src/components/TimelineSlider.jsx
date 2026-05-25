@@ -22,7 +22,7 @@ function toIso(date) {
 }
 
 function formatLabel(offsetHours, today) {
-  if (offsetHours === 0) return 'NOW — LIVE FEED'
+  if (offsetHours === 0) return addHours(today, 0).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }) + ' ' + String(addHours(today, 0).getUTCHours()).padStart(2,'0') + ':' + String(addHours(today, 0).getUTCMinutes()).padStart(2,'0') + ' UTC'
   const d = addHours(today, offsetHours)
   return d.toLocaleDateString('en-US', {
     year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC',
@@ -161,7 +161,7 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
         marginBottom: '6px',
         color: isDragging ? 'rgba(200,220,255,0.95)' : 'rgba(180,210,240,0.80)',
         transition: 'color 0.15s ease',
-        opacity: offsetHours === 0 ? 0.35 : 1,
+        opacity: 1,
       }}>
         {formatLabel(offsetHours, todayRef.current)}
         {isDragging && <span style={{ fontSize: '8px', marginLeft: '8px', color: 'rgba(100,160,220,0.5)', letterSpacing: '0.2em' }}>SCRUBBING</span>}
