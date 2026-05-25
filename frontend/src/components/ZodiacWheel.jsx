@@ -170,7 +170,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
   }, [angles])
 
   return (
-    <div style={{ width: 'clamp(280px, 85vw, 520px)', height: 'clamp(280px, 85vw, 520px)', position: 'relative', overflow: 'visible', flexShrink: 0 }}>
+    <div style={{ width: 'clamp(280px, 85vw, 520px)', height: 'clamp(280px, 85vw, 520px)', position: 'relative', overflow: 'visible', flexShrink: 0, margin: '0 auto' }}>
       <svg ref={svgRef} viewBox="-36 -36 672 672"
         style={{ position: 'absolute', top: '-8.6%', left: '-8.6%', width: '117.2%', height: '117.2%', filter: 'drop-shadow(0 0 32px rgba(60,85,130,0.12))' }}>
         <defs>
