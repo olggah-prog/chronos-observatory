@@ -183,7 +183,9 @@ export default function App() {
               </div>
             </div>
 
+            <div style={{ marginTop: "48px" }}>
             <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeekDt={setSeekDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
+            </div>
 
             <FixedStarContacts conjunctions={conjunctions} ayanamsha={meta.ayanamsha} ayanamsha_value={meta.ayanamsha_value}/>
             <TelemetryPanel planets={data.planets}/>
