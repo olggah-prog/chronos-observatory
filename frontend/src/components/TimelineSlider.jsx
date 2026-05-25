@@ -154,11 +154,11 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
       boxShadow: '0 0 24px rgba(100,150,200,0.06)',
     }}>
       {/* Row 1 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', gap: '8px', flexWrap: 'wrap' }}>
         <span className="text-[9px] tracking-[0.35em] text-slate-600 uppercase" style={{ flexShrink: 0 }}>
           Temporal Navigation
         </span>
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {SCALES.map((s, i) => (
             <button key={s.label} onClick={() => handleScale(i)}
               className="text-[8px] px-2 py-1 rounded tracking-[0.15em] border transition-colors"
