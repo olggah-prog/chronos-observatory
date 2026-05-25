@@ -183,7 +183,7 @@ export default function App() {
               </div>
             </div>
 
-            <div style={{ marginTop: "48px" }}>
+            <div style={{ marginTop: "24px" }}>
             <TimelineSlider value={selectedDt} onChange={setSelectedDt} onSeekDt={setSeekDt} onSeek={setSeeking} onPlayChange={setIsPlaying}/>
             </div>
 
