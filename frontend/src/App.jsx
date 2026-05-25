@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useDeferredValue } from 'react'
 import { useSkyData } from './hooks/useSkyData'
 import { getSkyMode, SKY_VARS } from './utils/atmosphere'
 import AtmosphericLayers from './components/AtmosphericLayers'
@@ -84,6 +84,7 @@ function LoadingBar() {
 
 export default function App() {
   const [selectedDt, setSelectedDt] = useState('')
+  const deferredDt = useDeferredValue(selectedDt)
   const [seeking, setSeeking]       = useState(false)
   const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
@@ -91,7 +92,7 @@ export default function App() {
   const [cityName,    setCityName]    = useState('')
 
 
-  const { data: rawData, loading, error, refetch } = useSkyData(selectedDt)
+  const { data: rawData, loading, error, refetch } = useSkyData(deferredDt)
   const data = useInterpolatedSky(rawData)
   const skyMode = data ? getSkyMode(data.planets) : 'night'
   const skyVars = SKY_VARS[skyMode]
