@@ -149,9 +149,7 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
 
   return (
     <div className="p-5 rounded" style={{
-      background: 'rgba(5,14,26,0.7)',
-      border: '1px solid rgba(180,210,240,0.10)',
-      boxShadow: '0 0 24px rgba(100,150,200,0.06)',
+      background: 'transparent',
     }}>
       {/* Time label — only show when not NOW */}
       {offsetHours !== 0 && <div style={{
