@@ -324,7 +324,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         <text x={CX} y={CY + R.outerRim + 26} textAnchor="middle"
           fontSize="6.5" fill="rgba(160,175,200,0.35)"
           style={{ fontFamily: 'monospace', letterSpacing: '0.18em' }}>
-          SYMBOLIC SKY · SIDEREAL MODE
+          
         </text>
       </svg>
       {activeP && (
