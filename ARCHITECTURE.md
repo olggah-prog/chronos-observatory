@@ -75,3 +75,32 @@ Primary backend for all calculations:
 - Not a Stellarium clone
 - Not copying Stellarium rendering
 - Chronos is its own engine, validated against external references
+
+## Accuracy Policy
+
+### Confidence Zones
+
+| Zone | Range | Backend | Notes |
+|------|-------|---------|-------|
+| Modern | 1550–2650 CE | Swiss Ephemeris / DE440 | Max confidence, cross-validate with Stellarium + NASA Horizons |
+| Historical | −13200–+17191 | Swiss Ephemeris / DE431/DE441 | Reliable, but less cross-reference available |
+| Deep Time | outside above | Swiss Ephemeris long-range | Model-based, show confidence indicator in UI |
+
+### Core Principle
+**Chronos should never silently degrade.**
+
+If date range or calculation confidence changes, the UI must reflect it:
+- Modern range → no indicator needed
+- Historical range → subtle "Historical model" note
+- Deep time → visible "Deep-time model" indicator
+
+### NOT like Time Nomad
+No artificial "1500 CE limit".
+Chronos is a serious time instrument — full Swiss Ephemeris range available,
+with honest confidence labeling per zone.
+
+### Validation Pipeline
+1. Primary: Swiss Ephemeris (always)
+2. Cross-check: Stellarium golden tests
+3. High-precision: NASA Horizons (spot checks)
+4. Future: optional JPL DE440/DE441 for Modern zone
