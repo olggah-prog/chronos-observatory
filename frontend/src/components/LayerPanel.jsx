@@ -1,6 +1,6 @@
 const ACTIVE = [
   { id: 'planets',     label: 'Planets',      active: true  },
-  { id: 'fixedstars',  label: 'Fixed Stars',  active: true  },
+  { id: 'fixedstars',  label: 'Stars',  active: true  },
 ]
 
 const ANCIENT = [

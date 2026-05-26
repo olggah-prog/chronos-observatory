@@ -114,7 +114,7 @@ export default function SystemsDropdown({ observer = null, cityName = '', showPl
         }}>
           <div style={{ marginBottom: '14px' }}>
             <ActiveRow label="Planets"     on={showPlanets} onToggle={onTogglePlanets}/>
-            <ActiveRow label="Fixed Stars" on={showStars}   onToggle={onToggleStars}/>
+            <ActiveRow label="Stars" on={showStars}   onToggle={onToggleStars}/>
           </div>
 
           <Divider label="Ancient Systems" />
