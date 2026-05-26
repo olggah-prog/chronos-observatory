@@ -14,7 +14,7 @@ export default function FixedStarContacts({ conjunctions = [], ayanamsha = '', a
       <div className="flex items-center justify-between mb-3 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}>
         <span className="text-[9px] tracking-[0.4em] text-slate-600 uppercase">
-          Star Contacts {count > 0 && <span className="text-amber-400/60 ml-1">{count}</span>}
+          Stars {count > 0 && <span className="text-amber-400/60 ml-1">{count}</span>}
         </span>
         <div className="flex items-center gap-3">
           {ayanamsha && ayanamsha_value != null && (
