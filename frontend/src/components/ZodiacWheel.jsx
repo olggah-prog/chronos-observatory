@@ -86,15 +86,18 @@ function AxisArrow({ lon, label, endR, lblR, lyOff = 0, minor = false }) {
   )
 }
 
-export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true, skyMode = "night" }) {
+export default function ZodiacWheel({ planets = [], angles = null, stars = [], conjunctions = [], showPlanets = true, showStars = true, skyMode = "night", skyFrame = "celestial" }) {
+  // Observer mode: offset all longitudes so ASC stays fixed on the left
+  const rotOff = (skyFrame === 'observer' && angles) ? (180 - angles.asc) : 0
+  const dlon = (lon) => ((lon + rotOff) % 360 + 360) % 360
   const [activeP, setActiveP] = useState(null)
   const svgRef = useRef(null)
 
   const segments = useMemo(() =>
     ZODIAC_META.map((sign, i) => ({
       ...sign,
-      labelPos: lonXY(i * 30 + 15, (R.zodiacOuter + R.zodiacInner) / 2),
-      path: arcPath(R.zodiacOuter, R.zodiacInner, i * 30, (i + 1) * 30),
+      labelPos: lonXY(dlon(i * 30 + 15), (R.zodiacOuter + R.zodiacInner) / 2),
+      path: arcPath(R.zodiacOuter, R.zodiacInner, dlon(i * 30), dlon((i + 1) * 30)),
     })), [])
 
   const ticks = useMemo(() => {
@@ -104,8 +107,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
       const mid   = deg % 10 === 0 && !major
       out.push({
         deg,
-        p1: lonXY(deg, R.tickOuter),
-        p2: lonXY(deg, major ? R.tickMajor : mid ? R.tickMid : R.tickInner),
+        p1: lonXY(dlon(deg), R.tickOuter),
+        p2: lonXY(dlon(deg), major ? R.tickMajor : mid ? R.tickMid : R.tickInner),
         major, mid, micro: false,
       })
     }
@@ -113,8 +116,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
       if (deg % 5 === 0) continue
       out.push({
         deg,
-        p1: lonXY(deg, R.tickOuter),
-        p2: lonXY(deg, R.tickOuter - 2.2),
+        p1: lonXY(dlon(deg), R.tickOuter),
+        p2: lonXY(dlon(deg), R.tickOuter - 2.2),
         major: false, mid: false, micro: true,
       })
     }
@@ -125,12 +128,12 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     if (!planets.length) return []
     const sorted = [...planets].sort((a, b) => a.longitude - b.longitude)
     return sorted.map((planet, i) => {
-      return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(planet.longitude, R.planet) }
+      return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(dlon(planet.longitude), R.planet) }
     })
   }, [planets])
 
   const starPositions = useMemo(() =>
-    stars.map(s => ({ ...s, pos: lonXY(s.lon, R.starRing) })), [stars])
+    stars.map(s => ({ ...s, pos: lonXY(dlon(s.lon), R.starRing) })), [stars, dlon])
 
   const conjStarNames = useMemo(() => new Set((conjunctions ?? []).map(c => c.star)), [conjunctions])
 
@@ -139,10 +142,10 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     const endR = R.zodiacInner - 3
     const lblR = R.outerRim + 12
     const items = [
-      { lon: angles.asc, label: 'ASC' },
-      { lon: angles.dsc, label: 'DSC' },
-      { lon: angles.mc,  label: 'MC', minor: true  },
-      { lon: angles.ic,  label: 'IC', minor: true  },
+      { lon: dlon(angles.asc), label: 'ASC' },
+      { lon: dlon(angles.dsc), label: 'DSC' },
+      { lon: dlon(angles.mc),  label: 'MC', minor: true  },
+      { lon: dlon(angles.ic),  label: 'IC', minor: true  },
     ].map(a => ({ ...a, endR, lblR, lyOff: 0 }))
     for (let i = 0; i < items.length; i++) {
       for (let j = i + 1; j < items.length; j++) {
@@ -163,9 +166,9 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     const endR = R.zodiacInner - 3
     return [
       { key: 'asc-dsc', dash: undefined,
-        p1: lonXY(angles.asc, endR), p2: lonXY(angles.dsc, endR) },
+        p1: lonXY(dlon(angles.asc), endR), p2: lonXY(dlon(angles.dsc), endR) },
       { key: 'mc-ic',   dash: '4 6',
-        p1: lonXY(angles.mc,  endR), p2: lonXY(angles.ic,  endR) },
+        p1: lonXY(dlon(angles.mc),  endR), p2: lonXY(dlon(angles.ic),  endR) },
     ]
   }, [angles])
 
