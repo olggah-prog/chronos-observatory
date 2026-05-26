@@ -98,7 +98,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
       ...sign,
       labelPos: lonXY(dlon(i * 30 + 15), (R.zodiacOuter + R.zodiacInner) / 2),
       path: arcPath(R.zodiacOuter, R.zodiacInner, dlon(i * 30), dlon((i + 1) * 30)),
-    })), [rotOff])
+    })), [])
 
   const ticks = useMemo(() => {
     const out = []
@@ -122,7 +122,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
       })
     }
     return out
-  }, [rotOff])
+  }, [])
 
   const planetPositions = useMemo(() => {
     if (!planets.length) return []
@@ -130,7 +130,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     return sorted.map((planet, i) => {
       return { ...planet, meta: PLANET_META[planet.name], pos: lonXY(dlon(planet.longitude), R.planet) }
     })
-  }, [planets, rotOff])
+  }, [planets])
 
   const starPositions = useMemo(() =>
     stars.map(s => ({ ...s, pos: lonXY(((s.lon + rotOff) % 360 + 360) % 360, R.starRing) })), [stars, rotOff])
