@@ -133,7 +133,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
   }, [planets])
 
   const starPositions = useMemo(() =>
-    stars.map(s => ({ ...s, pos: lonXY(dlon(s.lon), R.starRing) })), [stars, dlon])
+    stars.map(s => ({ ...s, pos: lonXY(((s.lon + rotOff) % 360 + 360) % 360, R.starRing) })), [stars, rotOff])
 
   const conjStarNames = useMemo(() => new Set((conjunctions ?? []).map(c => c.star)), [conjunctions])
 
@@ -149,7 +149,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
     ].map(a => ({ ...a, endR, lblR, lyOff: 0 }))
     for (let i = 0; i < items.length; i++) {
       for (let j = i + 1; j < items.length; j++) {
-        const pi = lonXY(items[i].lon, lblR), pj = lonXY(items[j].lon, lblR)
+        const pi = lonXY(dlon(items[i].lon), lblR), pj = lonXY(dlon(items[j].lon), lblR)
         const dx = pi.x - pj.x, dy = pi.y - pj.y
         if (Math.sqrt(dx*dx + dy*dy) < 28) {
           const sign = pi.y <= CY ? -1 : 1
@@ -228,7 +228,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         ))}
 
         {[0, 90, 180, 270].map(deg => {
-          const a = lonXY(deg, 32), b = lonXY(deg, R.innerBg - 2)
+          const a = lonXY(dlon(deg), 32), b = lonXY(dlon(deg), R.innerBg - 2)
           return <line key={deg} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
             stroke="rgba(255,255,255,0.04)" strokeWidth="0.4" strokeDasharray="1.5 9"/>
         })}
@@ -245,7 +245,7 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
         <g filter="url(#starGlow)" style={{ display: showStars ? 'block' : 'none' }}>
           {starPositions.map(s => {
             const isActive = conjStarNames.has(s.name)
-            const labelPt  = lonXY(s.lon, R.starRing + 12)
+            const labelPt  = lonXY(dlon(s.lon), R.starRing + 12)
             return (
               <g key={s.name}>
                 <title>{s.name} {s.lon.toFixed(2)}</title>
@@ -262,8 +262,8 @@ export default function ZodiacWheel({ planets = [], angles = null, stars = [], c
                   r={isActive ? 3.0 : 2.0}
                   fill={isActive ? 'rgba(255,250,210,0.95)' : 'rgba(255,248,200,0.38)'}/>
                 {isActive && (
-                  <text x={lonXY(s.lon, R.starRing + 9).x} y={lonXY(s.lon, R.starRing + 9).y}
-                    textAnchor={rimAnchor(lonXY(s.lon, R.starRing + 9))} dominantBaseline="middle"
+                  <text x={lonXY(dlon(s.lon), R.starRing + 9).x} y={lonXY(dlon(s.lon), R.starRing + 9).y}
+                    textAnchor={rimAnchor(lonXY(dlon(s.lon), R.starRing + 9))} dominantBaseline="middle"
                     fontSize="5.8"
                     fill="rgba(255,245,175,0.90)"
                     style={{ fontFamily: 'monospace', letterSpacing: '0.3px' }}>
