@@ -112,3 +112,23 @@ for tc in TEST_CASES:
         print(f"  ERROR: {e}")
 
 print("\n\nDone. Compare with Stellarium / Astro-Seek for validation.")
+
+
+# ─── GOLDEN TEST — frozen timestamp ───────────────────────────────────────────
+# Compare this output with Stellarium:
+# Location: Gdańsk (54.35°N, 18.65°E)
+# Time: 2026-05-26 19:12:00 UTC — PAUSED
+# Mode: tropical, geocentric, J2000
+# ──────────────────────────────────────────────────────────────────────────────
+
+GOLDEN = {
+    "name": "GOLDEN — Gdańsk 2026-05-26 19:12:00 UTC",
+    "dt": datetime(2026, 5, 26, 19, 12, 0, tzinfo=timezone.utc),
+    "lat": 54.35, "lon": 18.65,
+}
+
+print("\n" + "="*60)
+print("  GOLDEN TEST — for Stellarium comparison")
+print("  Set Stellarium: Gdańsk, 2026-05-26 19:12:00 UTC, PAUSED")
+print("="*60)
+run(GOLDEN)
