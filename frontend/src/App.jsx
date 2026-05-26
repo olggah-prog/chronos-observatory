@@ -84,7 +84,6 @@ function LoadingBar() {
 
 export default function App() {
   const [selectedDt, setSelectedDt] = useState('')
-  const [skyFrame, setSkyFrame] = useState('observer')
   const [seekDt, setSeekDt] = useState('')
   const deferredDt = useDeferredValue(selectedDt)
   const [seeking, setSeeking]       = useState(false)
@@ -176,17 +175,10 @@ export default function App() {
 
         {data && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', marginBottom: '4px' }}>
-              <button onClick={() => setSkyFrame(f => f === 'observer' ? 'celestial' : 'observer')}
-                className="text-[8px] tracking-[0.2em] px-3 py-1 rounded border transition-colors"
-                style={{ borderColor: 'rgba(100,180,240,0.25)', color: 'rgba(140,200,240,0.7)', background: 'transparent' }}>
-                {skyFrame === 'observer' ? '⊕ OBSERVER' : '✦ CELESTIAL'}
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '0px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
               <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
               <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))", justifyItems: "stretch", alignItems: "center" }}>
-                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode} skyFrame={skyFrame}/>
+                <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode}/>
                 <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode}/>
               </div>
             </div>
