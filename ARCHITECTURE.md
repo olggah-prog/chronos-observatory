@@ -45,3 +45,33 @@ Not "themes" — states of the atmosphere of time:
 - no upside-down labels
 - no detached coordinates
 - real sky panel is the primary atmosphere carrier
+
+## Astronomical Engine Strategy
+
+### Core: Swiss Ephemeris
+Primary backend for all calculations:
+- planets, Moon, Sun
+- sidereal/tropical zodiac
+- houses, ASC/MC
+- aspects, parans
+
+### Validation references
+- Stellarium — golden test comparisons (longitude, RA/Dec, alt/az, Moon phase)
+- NASA Horizons — high-precision cross-check
+- Swiss Ephemeris CLI — direct ephemeris baseline
+
+### Real Sky inspiration from Stellarium
+- atmosphere, horizon, twilight logic
+- constellation lines and star catalog (RA/Dec, proper motion, magnitude)
+- refraction / extinction / visibility modeling
+- rise/set/culmination
+
+### Future: Premium Accuracy Mode
+- optional JPL DE440/DE441 ephemerides
+- atmospheric refraction corrections
+- heliacal visibility with magnitude + twilight + Moon phase
+
+### What Chronos is NOT
+- Not a Stellarium clone
+- Not copying Stellarium rendering
+- Chronos is its own engine, validated against external references
