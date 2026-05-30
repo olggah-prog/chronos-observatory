@@ -106,7 +106,7 @@ function AngleMarker({ az, alt, label }) {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [], skyMode = "night" }) {
+export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [], skyMode = "night", starField = [] }) {
   const bodies = useMemo(() => {
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
@@ -197,6 +197,25 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
           <rect x="0" y="0" width={VW} height={HORIZON_Y} fill="url(#vsSkyBg)"/>
           <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill={(SKY_COLORS[skyMode]||SKY_COLORS.night).ground}/>
 
+          {/* HYG Star Field */}
+          <g opacity="1">
+            {starField.filter(s => s.alt > 0).map(s => {
+              const caz = toCompass(s.az)
+              const x = azToX(caz)
+              const y = altToY(s.alt)
+              const r = s.mag < 1 ? 2.8 : s.mag < 2 ? 2.2 : s.mag < 3 ? 1.7 : s.mag < 4 ? 1.2 : s.mag < 5 ? 0.9 : 0.6
+              const op = s.mag < 1 ? 0.95 : s.mag < 2 ? 0.85 : s.mag < 3 ? 0.75 : s.mag < 4 ? 0.60 : s.mag < 5 ? 0.45 : 0.30
+              return (
+                <g key={`star-${s.hip ?? s.name ?? s.ra}`}>
+                  <circle cx={x} cy={y} r={r} fill="white" opacity={op}/>
+                  {s.name && s.mag < 2.5 && (
+                    <text x={x+r+2} y={y+1} fontSize="6" fill="rgba(200,210,230,0.7)"
+                      style={{fontFamily: "monospace"}}>{s.name}</text>
+                  )}
+                </g>
+              )
+            })}
+          </g>
           {/* Background stars */}
           <g clipPath="url(#vsSkyClip)">
             {BG_STARS.map((s, i) => (
