@@ -3,6 +3,8 @@ import { useSkyData } from './hooks/useSkyData'
 import { getSkyMode, SKY_VARS } from './utils/atmosphere'
 import AtmosphericLayers from './components/AtmosphericLayers'
 import { useInterpolatedSky } from './hooks/useInterpolatedSky'
+import { useStarFieldProjection } from './hooks/useStarFieldProjection'
+import starCatalog from './data/stars_v1.json'
 import ZodiacWheel       from './components/ZodiacWheel'
 import VisibleSkyMap     from './components/VisibleSkyMap'
 import PlanetCard        from './components/PlanetCard'
@@ -95,6 +97,10 @@ export default function App() {
 
   const { data: rawData, loading, error, refetch } = useSkyData(deferredDt)
   const data = useInterpolatedSky(rawData, seekDt)
+  const masterTime = seekDt || selectedDt || ''
+  const observerLat = data?.observer?.lat ?? 54.35
+  const observerLon = data?.observer?.lon ?? 18.65
+  const projectedStars = useStarFieldProjection(starCatalog, masterTime, observerLat, observerLon)
   const skyMode = data ? getSkyMode(data.planets) : 'night'
   const skyVars = SKY_VARS[skyMode]
 
@@ -179,7 +185,7 @@ export default function App() {
               <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
               <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))", justifyItems: "stretch", alignItems: "center" }}>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode}/>
-                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode} starField={data.star_field ?? []}/>
+                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode} starField={projectedStars}/>
               </div>
             </div>
 
