@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
 const INTERP_MS = 1200
+const STAR_INTERP_MS = 60000 // TODO: replace with frontend LST-based projection
 
 function easeOut(t) {
   return 1 - Math.pow(1 - Math.min(t, 1), 3)
@@ -72,14 +73,15 @@ export function useInterpolatedSky(rawData, seekDt) {
     const next = {
       ...targetRef.current,
       planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
-      star_field: lerpStarField(fromRef.current?.star_field, targetRef.current.star_field, done ? 1 : t),
+      star_field: lerpStarField(fromRef.current?.star_field, targetRef.current.star_field, easeOut((now - startRef.current) / STAR_INTERP_MS)),
       angles:  lerpAngles(fromRef.current?.angles, targetRef.current.angles, done ? 1 : t),
     }
 
     displayedRef.current = next
     setDisplayed(next)
 
-    if (!done) rafRef.current = requestAnimationFrame(animate)
+    const starsDone = (now - startRef.current) >= STAR_INTERP_MS
+    if (!done || !starsDone) rafRef.current = requestAnimationFrame(animate)
   }, [])
 
   // When new API data arrives — animate from current visual position
