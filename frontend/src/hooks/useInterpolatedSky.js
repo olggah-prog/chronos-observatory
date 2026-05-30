@@ -43,6 +43,18 @@ function extrapolatePlanets(snapshot, deltaHours) {
   }
 }
 
+function lerpStarField(from, to, t) {
+  if (!from || !to || from.length === 0) return to
+  const toMap = {}
+  to.forEach(s => { toMap[s.hip ?? s.name] = s })
+  return from.map(s => {
+    const key = s.hip ?? s.name
+    const ts = toMap[key]
+    if (!ts) return s
+    return { ...ts, alt: s.alt + (ts.alt - s.alt) * t, az: s.az + (ts.az - s.az) * t }
+  })
+}
+
 export function useInterpolatedSky(rawData, seekDt) {
   const displayedRef = useRef(null)
   const [displayed, setDisplayed] = useState(null)
@@ -60,6 +72,7 @@ export function useInterpolatedSky(rawData, seekDt) {
     const next = {
       ...targetRef.current,
       planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
+      star_field: lerpStarField(fromRef.current?.star_field, targetRef.current.star_field, done ? 1 : t),
       angles:  lerpAngles(fromRef.current?.angles, targetRef.current.angles, done ? 1 : t),
     }
 
@@ -93,7 +106,6 @@ export function useInterpolatedSky(rawData, seekDt) {
     const seekMs = new Date(seekDt).getTime()
     const deltaHours = (seekMs - rawMs) / 3_600_000
     if (Math.abs(deltaHours) < 0.01) return
-    console.log("[interp] seekDt delta hours:", deltaHours.toFixed(2))
     const extrapolated = extrapolatePlanets(rawData, deltaHours)
     cancelAnimationFrame(rafRef.current)
     fromRef.current   = displayedRef.current || rawData
