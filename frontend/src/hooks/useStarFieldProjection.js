@@ -42,7 +42,8 @@ export function useStarFieldProjection(catalog, masterTime, lat, lon, maxMag = 5
       rafRef.current = requestAnimationFrame(project)
       return
     }
-    const t   = timeRef.current ? new Date(timeRef.current) : new Date()
+    const raw = timeRef.current ? new Date(timeRef.current) : new Date()
+    const t   = isNaN(raw.getTime()) ? new Date() : raw
     const jd  = jdFromDate(t)
     const lst = ((gmstDeg(jd) + lon) % 360 + 360) % 360
     const projected = catalog
