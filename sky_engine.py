@@ -4,7 +4,7 @@ from typing import Optional
 import os
 import swisseph as swe
 
-swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
+swe.set_ephe_path(os.getenv("EPHE_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "ephe")))
 swe.set_sid_mode(swe.SIDM_FAGAN_BRADLEY)
 AYANAMSHA_NAME = "fagan_bradley"
 SIDEREAL_FLAG = swe.FLG_SWIEPH | swe.FLG_SPEED | swe.FLG_SIDEREAL
@@ -63,7 +63,7 @@ def _is_applying(planet_speed: float, planet_lon: float, star_lon: float) -> boo
 
 
 def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
-    swe.set_ephe_path(os.getenv("EPHE_PATH", "/app/ephe"))
+    swe.set_ephe_path(os.getenv("EPHE_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "ephe")))
     ayanamsha_value = round(swe.get_ayanamsa(jd), 6)
     stars = []
     conjunctions = []
@@ -113,6 +113,14 @@ def _get_fixed_stars(jd: float, planet_data: list, orb: float = 2.0) -> dict:
         "conjunctions": sorted(conjunctions, key=lambda x: x["orb"]),
     }
 
+
+def get_star_field_data(jd, lat, lon):
+    try:
+        from star_field import get_star_field
+        return get_star_field(jd, lat, lon, mag_limit=5.5)
+    except Exception as e:
+        print(f"[star_field] error: {e}")
+        return []
 
 def get_sky_snapshot(
     dt: Optional[datetime] = None,
@@ -229,5 +237,6 @@ def get_sky_snapshot(
         "angles":        angles,
         "planets":       planets,
         "stars":         stars_data["stars"],
+        "star_field":    get_star_field_data(jd, observer_lat, observer_lon),
         "conjunctions":  stars_data["conjunctions"],
     }
