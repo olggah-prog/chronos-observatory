@@ -104,3 +104,34 @@ with honest confidence labeling per zone.
 2. Cross-check: Stellarium golden tests
 3. High-precision: NASA Horizons (spot checks)
 4. Future: optional JPL DE440/DE441 for Modern zone
+
+## Current Development Priority
+
+### NOW — RealSky Foundation
+
+1. **Star projection** — stars rotate as sky dome (useStarFieldProjection)
+2. **HYG star field** — real stars with magnitude, alt/az, visible flag
+3. **Constellation lines** — IAU lines + labels + toggle
+4. **Immersive Sky v1** — atmospheric gradient, horizon glow, bright star halo, depth
+
+### NEXT — Cosmogram
+
+5. Aspects (major + minor)
+6. Houses (Placidus)
+7. Chiron, Lilith, Nodes
+8. Observer/Celestial mode (coordinate pipeline)
+
+### LATER — Cultural layers
+
+9. Parans, heliacal events
+10. Egyptian, Maya, Jyotisha
+11. Arabic cycles, decans
+
+### The milestone that matters
+
+Not "when houses are done."
+
+When someone opens RealSky and thinks:
+"This looks like the sky outside my window."
+
+That is when Chronos becomes something different.
