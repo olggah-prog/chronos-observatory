@@ -64,22 +64,16 @@ export function useInterpolatedSky(rawData, seekDt) {
   const startRef  = useRef(null)
   const fromRef   = useRef(null)
   const rafRef    = useRef(null)
-  const lastStarUpdateRef = useRef(0)
 
   const animate = useCallback(() => {
     const now  = performance.now()
     const t    = easeOut((now - startRef.current) / INTERP_MS)
     const done = t >= 1
 
-    const starT = easeOut((now - startRef.current) / STAR_INTERP_MS)
-    const updateStars = (now - lastStarUpdateRef.current) > 100
-    if (updateStars) lastStarUpdateRef.current = now
     const next = {
       ...targetRef.current,
       planets: lerpPlanets(fromRef.current?.planets, targetRef.current.planets, done ? 1 : t),
-      star_field: updateStars
-        ? lerpStarField(fromRef.current?.star_field, targetRef.current.star_field, starT)
-        : displayedRef.current?.star_field,
+      star_field: lerpStarField(fromRef.current?.star_field, targetRef.current.star_field, easeOut((now - startRef.current) / STAR_INTERP_MS)),
       angles:  lerpAngles(fromRef.current?.angles, targetRef.current.angles, done ? 1 : t),
     }
 
