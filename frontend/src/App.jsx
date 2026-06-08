@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useDeferredValue } from 'react'
+import { useState, useEffect, useMemo, useRef, useDeferredValue } from 'react'
 import { useSkyData } from './hooks/useSkyData'
 import { getSkyMode, SKY_VARS } from './utils/atmosphere'
 import AtmosphericLayers from './components/AtmosphericLayers'
@@ -87,6 +87,7 @@ function LoadingBar() {
 export default function App() {
   const [selectedDt, setSelectedDt] = useState('')
   const [seekDt, setSeekDt] = useState('')
+  const [playCheckpoint, setPlayCheckpoint] = useState('')
   const deferredDt = useDeferredValue(selectedDt)
   const [seeking, setSeeking]       = useState(false)
   const [isPlaying, setIsPlaying]     = useState(false)
@@ -95,7 +96,8 @@ export default function App() {
   const [cityName,    setCityName]    = useState('')
 
 
-  const { data: rawData, loading, error, refetch } = useSkyData(deferredDt)
+  const fetchDt = isPlaying ? playCheckpoint : deferredDt
+  const { data: rawData, loading, error, refetch } = useSkyData(fetchDt)
   const data = useInterpolatedSky(rawData, seekDt)
   const masterTime = seekDt || selectedDt || ''
   const observerLat = data?.observer?.lat ?? 54.35
@@ -117,6 +119,19 @@ export default function App() {
   }, [data])
 
   useEffect(() => { if (loading) setSeeking(false) }, [loading])
+
+  // RealSky planets during Play: throttle backend fetch to ~1.5s.
+  // Stars ride the fast masterTime (seekDt); planets get accurate Swiss
+  // Ephemeris checkpoints from playCheckpoint. 1500ms > interp 1200ms so
+  // frames don't overlap and re-jitter the wheel.
+  const seekRef = useRef(seekDt)
+  useEffect(() => { seekRef.current = seekDt }, [seekDt])
+  useEffect(() => {
+    if (!isPlaying) return
+    setPlayCheckpoint(seekRef.current)
+    const id = setInterval(() => setPlayCheckpoint(seekRef.current), 1500)
+    return () => clearInterval(id)
+  }, [isPlaying])
   useEffect(() => {
     if (!selectedDt) {
       const id = setInterval(refetch, 60_000)

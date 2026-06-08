@@ -156,3 +156,26 @@ Next task — RealSky planets during Play:
   Implement a safe server throttle (fetch /sky every 1-2 s during Play) so planet
   alt/az come from Swiss Ephemeris, advancing in sync with the locally projected
   stars, without returning the wheel jitter.
+
+## RESOLVED — RealSky planets during Play (playCheckpoint throttle)
+
+The known issue above (planets static on RealSky during Play) is resolved.
+
+Solution: a playCheckpoint state in App.jsx. While isPlaying, a 1500ms timer
+copies the current seekDt into playCheckpoint; useSkyData is fed
+(isPlaying ? playCheckpoint : deferredDt). Stars keep riding the fast masterTime
+via local LST projection; planets receive accurate Swiss Ephemeris alt/az
+checkpoints from the backend roughly every 1.5s. No frontend alt/az projection.
+
+Backend GET /sky confirmed to fire ~once per 1.5s during Play (verified in
+dev.sh logs), so this did not trade the freeze for a fetch-storm.
+
+Planet motion on RealSky during Play is intentionally discrete (steps per
+checkpoint, not interpolated). At 1.5s cadence this is imperceptible for planets
+(Venus/Jupiter move negligibly per step) and is astronomically correct.
+
+Minor known issue (low severity, deferred):
+  The Moon glyph on the zodiac wheel may briefly wobble at the moment Play is
+  stopped, due to lerpAngle choosing a shortest-path arc on the final frame
+  transition. Cosmetic, sub-second, only on stop. Do NOT touch lerpAngle to fix
+  this without a dedicated session — it has caused regressions before.
