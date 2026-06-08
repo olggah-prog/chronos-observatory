@@ -85,8 +85,9 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
     setIsDragging(false)
     clearTimeout(throttleRef.current)
     commitChange(pendingHours.current)
+    onSeekDt?.('')
     onSeek?.(false)
-  }, [isDragging, commitChange, onSeek])
+  }, [isDragging, commitChange, onSeek, onSeekDt])
 
   const handlePointerDown = useCallback(() => {
     setIsDragging(true)
@@ -123,6 +124,8 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
       clearInterval(playRef.current)
       setPlaying(false)
       onPlayChange?.(false)
+      commitChange(pendingHours.current)
+      onSeekDt?.('')
       return
     }
     setPlaying(true)
@@ -131,8 +134,8 @@ export default function TimelineSlider({ value, onChange, onSeekDt, onSeek, onPl
       setOffsetHours(prev => {
         const next = prev >= scale.future ? -scale.past : prev + scale.step
         pendingHours.current = next
-        if (next === 0) onChange('')
-        else onChange(toIso(addHours(todayRef.current, next)))
+        if (next === 0) onSeekDt?.('')
+        else onSeekDt?.(toIso(addHours(todayRef.current, next)))
         return next
       })
     }, PLAY_INTERVAL_MS)

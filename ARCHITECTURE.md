@@ -135,3 +135,24 @@ When someone opens RealSky and thinks:
 "This looks like the sky outside my window."
 
 That is when Chronos becomes something different.
+
+## Known issue — RealSky planets during Play
+
+RealSky planet positions (alt/az) do not advance during Play.
+Cause: server /sky fetch is frozen during playback (Play drives seekDt, not
+selectedDt) to avoid the fetch-storm + animation-collision that made the
+zodiac wheel jitter. Stars advance correctly because they are projected on the
+frontend from masterTime via LST (useStarFieldProjection); planets still read
+server-provided alt/az, which are not recomputed while fetch is frozen.
+
+During manual scrub planets DO advance (server returns fresh frames per commit).
+
+A frontend ecliptic->alt/az reprojection (usePlanetProjection) was attempted and
+reverted: it produced an azimuth-reference mismatch (planets drifted sideways)
+and fought lerpAngle on large steps. Do not reintroduce frontend planet
+projection without first reconciling the azimuth convention against the server.
+
+Next task — RealSky planets during Play:
+  Implement a safe server throttle (fetch /sky every 1-2 s during Play) so planet
+  alt/az come from Swiss Ephemeris, advancing in sync with the locally projected
+  stars, without returning the wheel jitter.

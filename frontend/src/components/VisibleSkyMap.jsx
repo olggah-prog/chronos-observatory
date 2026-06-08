@@ -199,14 +199,14 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
 
           {/* HYG Star Field */}
           <g opacity="1">
-            {starField.filter(s => s.alt > 0).map(s => {
+            {starField.filter(s => s.alt > 0).map((s, si) => {
               const caz = toCompass(s.az)
               const x = azToX(caz)
               const y = altToY(s.alt)
               const r = s.mag < 1 ? 2.8 : s.mag < 2 ? 2.2 : s.mag < 3 ? 1.7 : s.mag < 4 ? 1.2 : s.mag < 5 ? 0.9 : 0.6
               const op = s.mag < 1 ? 0.95 : s.mag < 2 ? 0.85 : s.mag < 3 ? 0.75 : s.mag < 4 ? 0.60 : s.mag < 5 ? 0.45 : 0.30
               return (
-                <g key={`star-${s.hip ?? s.name ?? s.ra}`}>
+                <g key={`star-${s.hip || s.name || si}`}>
                   <circle cx={x} cy={y} r={r} fill="white" opacity={op}/>
                   {s.name && s.mag < 2.5 && (
                     <text x={x+r+2} y={y+1} fontSize="6" fill="rgba(200,210,230,0.7)"
