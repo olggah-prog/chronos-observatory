@@ -179,3 +179,100 @@ Minor known issue (low severity, deferred):
   stopped, due to lerpAngle choosing a shortest-path arc on the final frame
   transition. Cosmetic, sub-second, only on stop. Do NOT touch lerpAngle to fix
   this without a dedicated session — it has caused regressions before.
+
+# RealSky Architecture Principles
+
+## Source of Truth Separation
+
+Chronos separates astronomical truth from perceptual rendering.
+
+The backend, powered by Swiss Ephemeris, is the source of truth for:
+- Sun
+- Moon
+- planets
+- houses
+- aspects
+- parans
+- heliacal events
+
+The frontend is responsible for:
+- star-field projection
+- local sky rotation
+- smooth motion
+- atmosphere
+- visual perception
+- sky-state rendering
+
+Planetary objects must not be re-computed on the frontend. Their astronomical
+truth remains on the backend.
+
+## RealSky Is Not a Stellarium Clone
+
+RealSky is not designed as a complete astronomical coordinate renderer.
+Its purpose is not only to answer:
+  Where is the object?
+Its purpose is to answer:
+  How does this moment of sky look and feel to a human observer?
+
+## Astronomical Realism and Perceptual Realism
+
+Chronos uses two complementary layers of realism:
+
+1. Astronomical Realism — coordinates, time, objects, and ephemeris data must
+   remain accurate.
+2. Perceptual Realism — atmosphere, twilight, horizon glow, sky brightness,
+   object visibility, contrast, and human visual perception determine how the
+   sky is rendered.
+
+Perceptual layers must never fake astronomical geometry. They reveal it through
+the conditions of human seeing.
+
+## RealSky Principle
+
+RealSky does not render everything astronomy knows.
+RealSky renders what a human observer can plausibly see.
+
+A star may exist mathematically but disappear visually because of:
+- daylight
+- twilight
+- Moon brightness
+- atmospheric brightness
+- horizon haze
+- low altitude
+- perceptual contrast limits
+
+Therefore, star density is not a manual decoration parameter. It is derived from:
+  Sky Brightness -> Limiting Magnitude -> Star Visibility
+
+## Constellation Lines and Visibility
+
+Constellation lines must be visibility-aware.
+A constellation segment should know the visibility state of both endpoint stars.
+Atmosphere V1 must not create floating or disconnected constellation lines when
+one or both endpoint stars are no longer visually visible.
+
+Recommended rule:
+- both endpoint stars visible -> full line
+- one endpoint visible -> faded or partial line
+- both endpoint stars hidden -> line hidden
+
+This keeps constellation rendering consistent with perceptual sky realism.
+
+## Current Task Order
+
+1. Constellation Lines
+2. RealSky Atmosphere V1
+3. Houses
+4. Aspects
+
+## Deferred / Do Not Touch Now
+
+The following areas are intentionally deferred until the RealSky foundation is
+stronger:
+- Observer Mode
+- Moon wobble on STOP
+- lerpAngle cleanup
+- coordinate pipeline refactor
+
+The current RealSky foundation after commit 2ace059 is stable and should not be
+destabilized by low-priority architectural work.
