@@ -276,3 +276,34 @@ stronger:
 
 The current RealSky foundation after commit 2ace059 is stable and should not be
 destabilized by low-priority architectural work.
+
+## Constellation Lines V1 — DONE
+
+Source: Stellarium western sky culture constellationship.fab (pinned commit
+3c8d3c4), GPLv2+ data, credit Stellarium. Converted to
+frontend/src/data/constellations_v1.json: {"Con": [[hipA,hipB],...]} — 88
+constellations, 674/676 segments covered by stars_v1.json (99.7%; 2 dropped in
+CMa, endpoint stars fainter than mag 6.5).
+
+Rendering: pure visual layer in VisibleSkyMap beneath the star field. Reuses
+already-projected starField (hip -> x/y); no new astronomy on the frontend.
+Style: strokeWidth 0.5, rgba(150,170,200), opacity 0.28 full / 0.13 dimmed
+(one endpoint below horizon), pointer-events none, no labels.
+Visibility rule: both endpoints above horizon -> full line; one -> dimmed;
+none -> hidden. Seam-wrapping segments (|x1-x2| > VW/2) are skipped in V1.
+When Atmosphere V1 lands, visibility should switch from alt>0 to the
+limiting-magnitude pipeline — geometry stays unchanged.
+
+Star name labels on RealSky were removed (perceptual realism: an observer sees
+figures, not text). Future "Star Labels" becomes its own independent layer.
+
+## Known issue — SystemsDropdown toggles inert (pre-existing)
+
+Clicking Planets/Stars/Constellations rows in SystemsDropdown closes the panel
+without toggling anything (predates Constellation Lines work). Likely the
+outside-click-close handler swallows the row click before onToggle fires.
+showConstellations is correctly wired in App (VisibleSkyMap gets
+showConstellations ? lines : {}), so the toggle will work as soon as the panel
+is fixed. LayerPanel.jsx is a dead decorative component (no onClick, not
+rendered from App) — candidate for removal or unification with SystemsDropdown.
+Fix in a dedicated session; do not mix with feature work.

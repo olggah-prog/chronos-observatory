@@ -106,7 +106,7 @@ function AngleMarker({ az, alt, label }) {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [], skyMode = "night", starField = [] }) {
+export default function VisibleSkyMap({ planets = [], angles = null, paranEvents = [], skyMode = "night", starField = [], constellations = {} }) {
   const bodies = useMemo(() => {
     const sunLon     = planets.find(p => p.name === 'Sun')?.longitude  ?? 0
     const moonLon    = planets.find(p => p.name === 'Moon')?.longitude ?? 0
@@ -130,6 +130,28 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
         }
       })
   }, [planets])
+
+  // Constellation lines: visual layer only — reuses already-projected stars.
+  // No new astronomy. Seam segments (wrapping the 360° edge) are skipped in V1.
+  const constellationSegs = useMemo(() => {
+    if (!starField?.length) return []
+    const byHip = {}
+    starField.forEach(s => { if (s.hip) byHip[s.hip] = s })
+    const segs = []
+    Object.values(constellations).forEach(pairs => {
+      pairs.forEach(([a, b]) => {
+        const sa = byHip[a], sb = byHip[b]
+        if (!sa || !sb) return
+        const va = sa.alt > 0, vb = sb.alt > 0
+        if (!va && !vb) return                      // both below horizon — hidden
+        const x1 = azToX(toCompass(sa.az)), y1 = altToY(Math.max(sa.alt, 0))
+        const x2 = azToX(toCompass(sb.az)), y2 = altToY(Math.max(sb.alt, 0))
+        if (Math.abs(x1 - x2) > VW / 2) return      // seam wrap — skip in V1
+        segs.push({ x1, y1, x2, y2, dim: !(va && vb) })
+      })
+    })
+    return segs
+  }, [constellations, starField])
 
   const visibleCount = bodies.filter(b => b.visible && !b.isNode).length
 
@@ -197,6 +219,16 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
           <rect x="0" y="0" width={VW} height={HORIZON_Y} fill="url(#vsSkyBg)"/>
           <rect x="0" y={HORIZON_Y} width={VW} height={VH - HORIZON_Y} fill={(SKY_COLORS[skyMode]||SKY_COLORS.night).ground}/>
 
+          {/* Constellation lines — visual layer beneath stars, no interactivity */}
+          <g style={{ pointerEvents: 'none' }}>
+            {constellationSegs.map((sg, i) => (
+              <line key={`cseg-${i}`}
+                x1={sg.x1} y1={sg.y1} x2={sg.x2} y2={sg.y2}
+                stroke="rgba(150,170,200,1)" strokeWidth="0.5"
+                opacity={sg.dim ? 0.13 : 0.28}/>
+            ))}
+          </g>
+
           {/* HYG Star Field */}
           <g opacity="1">
             {starField.filter(s => s.alt > 0).map((s, si) => {
@@ -208,10 +240,6 @@ export default function VisibleSkyMap({ planets = [], angles = null, paranEvents
               return (
                 <g key={`star-${s.hip || s.name || si}`}>
                   <circle cx={x} cy={y} r={r} fill="white" opacity={op}/>
-                  {s.name && s.mag < 2.5 && (
-                    <text x={x+r+2} y={y+1} fontSize="6" fill="rgba(200,210,230,0.7)"
-                      style={{fontFamily: "monospace"}}>{s.name}</text>
-                  )}
                 </g>
               )
             })}

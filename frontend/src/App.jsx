@@ -5,6 +5,7 @@ import AtmosphericLayers from './components/AtmosphericLayers'
 import { useInterpolatedSky } from './hooks/useInterpolatedSky'
 import { useStarFieldProjection } from './hooks/useStarFieldProjection'
 import starCatalog from './data/stars_v1.json'
+import constellationLines from './data/constellations_v1.json'
 import ZodiacWheel       from './components/ZodiacWheel'
 import VisibleSkyMap     from './components/VisibleSkyMap'
 import PlanetCard        from './components/PlanetCard'
@@ -93,6 +94,7 @@ export default function App() {
   const [isPlaying, setIsPlaying]     = useState(false)
   const [showPlanets, setShowPlanets] = useState(true)
   const [showStars,   setShowStars]   = useState(true)
+  const [showConstellations, setShowConstellations] = useState(true)
   const [cityName,    setCityName]    = useState('')
 
 
@@ -197,10 +199,10 @@ export default function App() {
         {data && (
           <>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '8px' }}>
-              <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)}/>
+              <SystemsDropdown observer={data?.observer ?? null} cityName={cityName} showPlanets={showPlanets} showStars={showStars} showConstellations={showConstellations} onTogglePlanets={() => setShowPlanets(v => !v)} onToggleStars={() => setShowStars(v => !v)} onToggleConstellations={() => setShowConstellations(v => !v)}/>
               <div className="grid grid-cols-1 xl:grid-cols-2 items-center" style={{ gap: "48px", gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))", justifyItems: "stretch", alignItems: "center" }}>
                 <ZodiacWheel planets={data.planets} angles={data.angles ?? null} stars={stars} conjunctions={conjunctions} showPlanets={showPlanets} showStars={showStars} skyMode={skyMode}/>
-                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode} starField={projectedStars}/>
+                <VisibleSkyMap planets={data.planets} angles={data.angles ?? null} skyMode={skyMode} starField={projectedStars} constellations={showConstellations ? constellationLines : {}}/>
               </div>
             </div>
 

@@ -56,7 +56,7 @@ function Row({ name }) {
   )
 }
 
-export default function SystemsDropdown({ observer = null, cityName = '', showPlanets = true, showStars = true, onTogglePlanets, onToggleStars }) {
+export default function SystemsDropdown({ observer = null, cityName = '', showPlanets = true, showStars = true, showConstellations = true, onTogglePlanets, onToggleStars, onToggleConstellations }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -115,6 +115,7 @@ export default function SystemsDropdown({ observer = null, cityName = '', showPl
           <div style={{ marginBottom: '14px' }}>
             <ActiveRow label="Planets"     on={showPlanets} onToggle={onTogglePlanets}/>
             <ActiveRow label="Stars" on={showStars}   onToggle={onToggleStars}/>
+            <ActiveRow label="Constellations" on={showConstellations} onToggle={onToggleConstellations}/>
           </div>
 
           <Divider label="Ancient Systems" />
