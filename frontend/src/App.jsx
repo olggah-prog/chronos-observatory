@@ -98,7 +98,8 @@ export default function App() {
   const [cityName,    setCityName]    = useState('')
 
 
-  const fetchDt = isPlaying ? playCheckpoint : deferredDt
+  const scrubbing = !isPlaying && !!seekDt
+  const fetchDt = (isPlaying || scrubbing) ? playCheckpoint : deferredDt
   const { data: rawData, loading, error, refetch } = useSkyData(fetchDt)
   const data = useInterpolatedSky(rawData, seekDt)
   const masterTime = seekDt || selectedDt || ''
@@ -129,11 +130,11 @@ export default function App() {
   const seekRef = useRef(seekDt)
   useEffect(() => { seekRef.current = seekDt }, [seekDt])
   useEffect(() => {
-    if (!isPlaying) return
+    if (!isPlaying && !scrubbing) return
     setPlayCheckpoint(seekRef.current)
     const id = setInterval(() => setPlayCheckpoint(seekRef.current), 1500)
     return () => clearInterval(id)
-  }, [isPlaying])
+  }, [isPlaying, scrubbing])
   useEffect(() => {
     if (!selectedDt) {
       const id = setInterval(refetch, 60_000)
