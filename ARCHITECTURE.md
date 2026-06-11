@@ -330,3 +330,44 @@ Examples that go directly to main (verified before commit):
 
 Note: the wheel wobble on release applies to BOTH Play stop and slider mouseup
 (same lerpAngle final-frame mechanism). Pre-existing, low severity, deferred.
+
+## Planned task — Planet smoothing on RealSky (designed, not started)
+
+Problem:
+  RealSky planet positions update via discrete backend checkpoints (~1.5s
+  during Play and drag) and look stepped, while the star field glides at
+  ~30fps. Raising star projection rate did not change perceived smoothness —
+  the bottleneck is planet stepping, not star rate.
+
+Goal:
+  Interpolate planet alt/az on the frontend BETWEEN two consecutive backend
+  checkpoints, so planets visually glide. Endpoints of every interpolation
+  segment are authoritative Swiss Ephemeris values — the frontend never
+  invents positions, it only blends between two server truths.
+
+Source of truth:
+  Backend checkpoints remain authoritative. This is NOT frontend ephemeris
+  (cf. the reverted usePlanetProjection) — no ecliptic->alt/az math on the
+  frontend, only linear blending between served alt/az pairs.
+
+Do not touch:
+  - backend
+  - coordinate pipeline
+  - Observer Mode
+  - frontend ephemeris of any kind
+
+Caution zone:
+  Implementation lives next to useInterpolatedSky / lerpAngle. Azimuth blending
+  must handle the 0/360 wrap WITHOUT reusing lerpAngle blindly (its
+  shortest-path choice caused the Moon wobble). Consider a dedicated
+  short-arc blend for alt/az with a max-delta guard: if the checkpoint gap
+  exceeds a threshold (fast scrub), snap instead of glide.
+
+Acceptance:
+  - planets visually glide between checkpoints during Play and drag
+  - final positions exactly match backend on stop/release (no drift)
+  - no new jump or wobble on stop/release
+  - zodiac wheel behavior unchanged
+  - GET /sky cadence unchanged (~1.5s)
+
+Dedicated session. Likely main (small/medium) unless it grows — then branch.
