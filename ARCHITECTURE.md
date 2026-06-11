@@ -307,3 +307,23 @@ showConstellations ? lines : {}), so the toggle will work as soon as the panel
 is fixed. LayerPanel.jsx is a dead decorative component (no onClick, not
 rendered from App) — candidate for removal or unification with SystemsDropdown.
 Fix in a dedicated session; do not mix with feature work.
+
+## Git Workflow
+
+Current workflow: work directly in main for small and medium verified changes.
+Use feature branches only for risky multi-session refactors, coordinate pipeline
+changes, deployment-sensitive experiments, or when additional collaborators join
+the project. Never commit broken states to main.
+
+Examples requiring a feature branch:
+- coordinate pipeline refactor
+- Observer Mode
+- houses in RealSky
+- parans engine
+- new projection engine
+
+Examples that go directly to main (verified before commit):
+- visual tweaks (opacity, stroke, sizing)
+- new data layers (star labels, constellation names)
+- adding UI toggles
+- documentation updates
