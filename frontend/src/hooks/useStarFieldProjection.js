@@ -33,7 +33,7 @@ export function useStarFieldProjection(catalog, masterTime, lat, lon, maxMag = 5
 
   const project = useCallback(() => {
     const now = performance.now()
-    if (now - lastRef.current < 100) {
+    if (now - lastRef.current < 33) {
       rafRef.current = requestAnimationFrame(project)
       return
     }
