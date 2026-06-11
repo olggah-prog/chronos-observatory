@@ -327,3 +327,6 @@ Examples that go directly to main (verified before commit):
 - new data layers (star labels, constellation names)
 - adding UI toggles
 - documentation updates
+
+Note: the wheel wobble on release applies to BOTH Play stop and slider mouseup
+(same lerpAngle final-frame mechanism). Pre-existing, low severity, deferred.
