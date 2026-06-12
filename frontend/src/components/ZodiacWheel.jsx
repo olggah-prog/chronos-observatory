@@ -24,7 +24,7 @@ const WHEEL_BG = {
 }
 
 const PLANET_SIZE = {
-  Sun: 24, Moon: 20,
+  Sun: 21, Moon: 19,
   Mercury: 18, Venus: 18, Mars: 18,
   Jupiter: 18, Saturn: 18, Uranus: 18, Neptune: 18, Pluto: 18,
   NNode: 18, SNode: 18,

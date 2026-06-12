@@ -371,3 +371,26 @@ Acceptance:
   - GET /sky cadence unchanged (~1.5s)
 
 Dedicated session. Likely main (small/medium) unless it grows — then branch.
+
+## Planned task — Planet glyph set (designed, not started)
+
+Problem:
+  Planet symbols on the zodiac wheel (and RealSky) are serif font glyphs.
+  Each glyph has its own intrinsic geometry: Venus/Mars render large and
+  thin-stroked, lunar nodes smaller but heavier, Sun compact. No combination
+  of fontSize values can make the ensemble uniform — the inconsistency is in
+  the typeface, not the numbers.
+
+Goal:
+  Replace font glyphs with a dedicated SVG icon set: 12 planet/node symbols
+  with identical stroke width, identical bounding box, single visual weight.
+  Apply in both ZodiacWheel and VisibleSkyMap so the two views share one
+  symbol language.
+
+Approach options:
+  - adopt an existing open astronomical SVG glyph set with uniform style, or
+  - draw a custom minimal set (museum-grade: thin uniform stroke, no fill
+    decoration).
+
+Scope: visual layer only. No astronomy, no layout changes.
+Daylight session with visual iterations; goes to main per workflow policy.
